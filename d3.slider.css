@@ -4,6 +4,7 @@
     font-size: 1.1em;
     border: 1px solid #aaaaaa;
     z-index: 2;
+    margin-bottom: 20px;
 }
 
 .d3-slider-horizontal {
@@ -38,7 +39,7 @@
     border: 1px solid #d3d3d3;
     border-radius: 4px;
     background: #eee;
-    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);
+    background: linear-gradient(to bottom, #88f 0%, #448 100%);
     z-index: 3;
 }
 
