@@ -8,34 +8,32 @@ function onAgeMinChange(evt, value) {
     d3.select('#text_age_min').text(value);
     n = Number(value) + Number(d3.select('#text_age_span').text()) - 1;
     d3.select('#text_age_max').text(n);
-    update_data_on_display();
+    refresh();
 }
 
 function onAgeSpanChange(evt, value) {
     d3.select('#text_age_span').text(value);
     n = Number(d3.select('#text_age_min').text()) + Number(value) - 1;
     d3.select('#text_age_max').text(n);
-    update_data_on_display();
+    refresh();
 }
 
 var census_data, data_on_display = {};
 
-function update_data_on_display() {
-    age = Number(d3.select('#text_age_min').text());
-    span = Number(d3.select('#text_age_span').text());
+function percentage(d) { 
+    min_group = Number(d3.select('#text_age_min').text()) / 5;
+    total_groups = Number(d3.select('#text_age_span').text()) / 5;
+    town = d.key;
+    ratio = 0;
+    for (i=0; i<total_groups && min_group+i<=20; ++i)
+	ratio += census_data[town]['男'][min_group+i] + census_data[town]['女'][min_group+i];
+    ratio /= census_data[town]['male_total'] + census_data[town]['female_total'];
+    return (ratio*width).toString() + 'px';
+}
 
-    for (town in census_data) {
-	ratio = 0;
-	for (i=0; i<span/5; ++i) ratio += census_data[town]['男'][age/5+i];
-	ratio /= census_data[town]['male_total'];
-	data_on_display[town] = {
-	    'percent': ratio
-	};
-    }
-
+function refresh() {
     bar_chart = d3.select('#bar_chart');
-    width = parseInt(bar_chart.style("width")) - 10;
-    console.log(width);
+    width = parseInt(bar_chart.style('width')) - 120;
 /*
     data_on_display = {
 	'臺中市霧峰區': { 'percent': 0.3 },
@@ -46,26 +44,30 @@ function update_data_on_display() {
 */
     // https://stackoverflow.com/questions/13808741/bar-chart-with-d3-js-and-an-associative-array
     // Bar chart with d3.js and an associative array
-    divs = bar_chart.selectAll('div').data(
-	d3.entries(data_on_display), function(d) {
-	    return d.key;
-	}
+    divs = bar_chart.selectAll('.entry').data(
+	d3.entries(census_data), function(d) { return d.key; }
     );
 
     divs.exit().remove();
-    divs.enter()
+
+    // https://stackoverflow.com/questions/13203897/d3-nested-appends-and-data-flow
+    new_entries = divs.enter()
 	.append('div')
-	.attr('class', 'stat_bar')
-	.append('span')
-	.attr('class', 'stat_text')
+	.attr('class', 'entry');
+    new_entries.append('div')
+	.attr('class', 'entry_text')
 	.html(function(d) { return d.key; });
-    divs.transition()
-	.style('width', function(d) { return (d.value.percent*width).toString() + 'px'; });
+    new_entries.append('div')
+	.attr('class', 'entry_bar')
+	.html('&nbsp;');
+
+    divs.select('.entry_bar').transition()
+	.style('width', percentage);
 }
 
 d3.json('census-taichung.json', function(error, data) {
     if (error) return console.warn(error);
     census_data = data;
-    update_data_on_display();
+    refresh();
 });
 

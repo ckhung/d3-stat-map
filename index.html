@@ -19,20 +19,29 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   <div id="content">
     <h1>使用 D3 製作的統計地圖</h1>
 
-    <h2>年齡範圍</h2>
+    <h2>[年齡範圍]</h2>
 
     <p>從 <span id= "text_age_min">0</span> 歲到
     <span id="text_age_max">14</span> 歲
     (顯示範圍： <span id="text_age_span">5</span> 歲)
 
-    <div id="slider_age_min"></div>
-    <div id="slider_age_span"></div>
+    <div class="control">
+	<div id="slider_age_min"></div>
+	<div id="slider_age_span"></div>
+    </div>
+
+    <p>注意： 若改變視窗大小， 就需要重新整理網頁才能操作。</p>
+
+    <h2>[長條圖]</h2>
+
+    <p>各階段年齡的人口佔該區總人口多少百分比：</p>
 
     <div id="bar_chart">
 <!--
-      <div class="stat_bar" style="width: 200px">&nbsp;</div>
-      <div class="stat_bar" style="width: 50px">&nbsp;</div>
-      <div class="stat_bar" style="width: 150px">&nbsp;</div>
+      <div class="entry"><div class="entry_text">臺中市霧峰區</div> <div class="entry_bar" style="width: 120px">&nbsp;</div></div>
+      <div class="entry"><div class="entry_text">臺中市大里區</div> <div class="entry_bar" style="width: 180px">&nbsp;</div></div>
+      <div class="entry"><div class="entry_text">臺中市太平區</div> <div class="entry_bar" style="width: 230px">&nbsp;</div></div>
+      <div class="entry"><div class="entry_text">臺中市烏日區</div> <div class="entry_bar" style="width: 200px">&nbsp;</div></div>
 -->
     </div>
   </div>

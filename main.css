@@ -9,18 +9,26 @@ h2 {
 }
 
 #bar_chart {
-  margin-top: 30px;
-  padding-left: 120px;
-  background-color: #f8fff8;
 }
 
-.stat_bar {
-  background-color: #c88;
+.control {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 30px;
+}
+
+/* https://stackoverflow.com/questions/2637696/how-to-place-div-side-by-side */
+.entry {
+  display: flex;
   margin-top: 2px;
   margin-bottom: 2px;
 }
 
-.stat_text {
-  margin-left: -120px;
+.entry_text {
+  width: 120px;
+}
+
+.entry_bar {
+  background-color: #8c8;
 }
 
