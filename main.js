@@ -64,34 +64,43 @@ function refresh_gender_plot() {
     svg.select('#background')
 	.attr('width', '100%')
 	.attr('height', '100%');
-    var x = d3.scale.linear()
+    var xs = d3.scale.linear()
 	.range([0, width])
-	.domain(Object.keys(census_data).map(function (k) {
-	    return pop_ratio(census_data[k]);
+	.domain(census_data.map(function (d) {
+	    return pop_ratio(d);
 	}));
-    var y = x;
     
-/*
-    var towns = svg.selectAll('text.town').data(
-	d3.entries(census_data), function(d) { return d.key; }
+    var ys = d3.scale.linear()
+	.range([width, 0])
+	.domain(census_data.map(function (d) {
+	    return pop_ratio(d);
+	}));
+    
+    var towns = svg.selectAll('.town').data(
+	census_data, function(d) { return d.name; }
     );
 
     towns.exit().remove();
 
-    var new_towns = svg.enter()
-	.append('text')
-	.attr('class', 'town')
-	.text(function (d) { return d.key; });
+    var new_towns = towns.enter()
+	.append('g')
+	.attr('class', 'town');
+    new_towns.append('text')
+	.text(function (d) { return d.name; })
+	.attr('text-anchor', 'middle')
+	.attr('dominant-baseline', 'middle');
+// http://lea.verou.me/2013/03/easily-center-text-vertically-with-svg/
 
-    towns.select('text.town').transition()
-	.attr('x', pop_ratio)
-	.attr('y', pop_ratio);
-*/
+console.log(new_towns);
+console.log(towns);
+    towns.select('text').transition()
+	.attr('x', function(d) { return xs(pop_ratio(d)); } )
+	.attr('y', function(d) { return ys(pop_ratio(d)); } )
 }
 
 function refresh_all() {
     refresh_bar_chart();
-//    refresh_gender_plot();
+    refresh_gender_plot();
 }
 
 d3.json('census-taichung.json', function(error, data) {
