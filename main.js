@@ -1,47 +1,42 @@
 d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
-    step(5).on('slide', onAgeMinChange));
+    step(1).on('slide', onAgeMinChange));
 
-d3.select('#slider_age_span').call(d3.slider().axis(true).min(5).max(100).
-    step(5).on('slide', onAgeSpanChange));
+d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
+    step(1).on('slide', onAgeSpanChange));
 
 function onAgeMinChange(evt, value) {
     d3.select('#text_age_min').text(value);
     n = Number(value) + Number(d3.select('#text_age_span').text()) - 1;
     d3.select('#text_age_max').text(n);
-    refresh();
+    refresh_bar_chart();
 }
 
 function onAgeSpanChange(evt, value) {
     d3.select('#text_age_span').text(value);
     n = Number(d3.select('#text_age_min').text()) + Number(value) - 1;
     d3.select('#text_age_max').text(n);
-    refresh();
+    refresh_bar_chart();
 }
 
-var census_data, data_on_display = {};
+var census_data;
 
-function percentage(d) { 
-    min_group = Number(d3.select('#text_age_min').text()) / 5;
-    total_groups = Number(d3.select('#text_age_span').text()) / 5;
+function pop_ratio(d) { 
+    min_age = Number(d3.select('#text_age_min').text());
+    age_span = Number(d3.select('#text_age_span').text());
     town = d.key;
-    ratio = 0;
-    for (i=0; i<total_groups && min_group+i<=20; ++i)
-	ratio += census_data[town]['男'][min_group+i] + census_data[town]['女'][min_group+i];
-    ratio /= census_data[town]['male_total'] + census_data[town]['female_total'];
+    upper = min_age+age_span;
+    if (upper > 101) upper = 101;
+    ratio = (census_data[town]['男'][upper]
+	  + census_data[town]['女'][upper]
+	  - census_data[town]['男'][min_age]
+	  - census_data[town]['女'][min_age] )
+	  / (census_data[town]['男'][101] + census_data[town]['女'][101]);
     return (ratio*width).toString() + 'px';
 }
 
-function refresh() {
-    bar_chart = d3.select('#bar_chart');
-    width = parseInt(bar_chart.style('width')) - 120;
-/*
-    data_on_display = {
-	'臺中市霧峰區': { 'percent': 0.3 },
-	'臺中市大里區': { 'percent': 0.1 },
-	'臺中市太平區': { 'percent': 0.2 },
-	'臺中市烏日區': { 'percent': 0.25 }
-    };
-*/
+function refresh_bar_chart() {
+    bar_chart = d3.select('#bar_chart_proper');
+    width = parseInt(bar_chart.style('width')) - 140;
     // https://stackoverflow.com/questions/13808741/bar-chart-with-d3-js-and-an-associative-array
     // Bar chart with d3.js and an associative array
     divs = bar_chart.selectAll('.entry').data(
@@ -56,18 +51,22 @@ function refresh() {
 	.attr('class', 'entry');
     new_entries.append('div')
 	.attr('class', 'entry_text')
-	.html(function(d) { return d.key; });
+	.html(function(d) { return d.key; })
     new_entries.append('div')
 	.attr('class', 'entry_bar')
 	.html('&nbsp;');
 
     divs.select('.entry_bar').transition()
-	.style('width', percentage);
+	.style('width', pop_ratio);
 }
 
 d3.json('census-taichung.json', function(error, data) {
     if (error) return console.warn(error);
     census_data = data;
-    refresh();
+    for (town in census_data) {
+	census_data[town]['男'].unshift(0);
+	census_data[town]['女'].unshift(0);
+    }
+    refresh_bar_chart();
 });
 

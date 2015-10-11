@@ -5,10 +5,10 @@ h2 {
 
 #content {
   margin: 10px;
-  background-color: #ffe;
 }
 
-#bar_chart {
+#main_display {
+  background-color: #ffe;
 }
 
 .control {
@@ -17,11 +17,23 @@ h2 {
   margin-bottom: 30px;
 }
 
+a.div-switch {
+  background-color: #eee;
+  text-decoration: none;
+  text-color: darkred;
+  color: #000;
+}
+
+a.div-switch.active {
+  background-color: #ccf;
+}
+
 /* https://stackoverflow.com/questions/2637696/how-to-place-div-side-by-side */
 .entry {
   display: flex;
   margin-top: 2px;
   margin-bottom: 2px;
+  padding-right: 20px;
 }
 
 .entry_text {
