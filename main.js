@@ -51,7 +51,7 @@ function refresh_bar_chart() {
 	.attr('class', 'entry');
     new_entries.append('div')
 	.attr('class', 'entry_text')
-	.html(function(d) { return d.key; })
+	.html(function(d) { return d.key; });
     new_entries.append('div')
 	.attr('class', 'entry_bar')
 	.html('&nbsp;');
@@ -62,7 +62,6 @@ function refresh_bar_chart() {
 
 function refresh_gender_plot() {
     width = parseInt(d3.select('#gender_plot_panel').style('width'));
-console.log('width' + width.toString());
     svg = d3.select('#gender_plot_panel').select('svg');
     svg.attr('width', width).attr('height', width);
     svg.append('rect')
@@ -74,20 +73,20 @@ console.log('width' + width.toString());
 function refresh_all(e) {
     refresh_bar_chart();
     refresh_gender_plot();
-console.log('refresh_all');
 }
 
 d3.json('census-taichung.json', function(error, data) {
     if (error) return console.warn(error);
     census_data = data;
-    for (town in census_data) {
+    for (var town in census_data) {
 	census_data[town]['男'].unshift(0);
 	census_data[town]['女'].unshift(0);
     }
 
-    d3.select("#gender_plot_panel").append("svg")
+    d3.select("#gender_plot_panel").append("svg");
 
     d3.select(window).on('resize', refresh_all); 
     d3.selectAll('button.div-switch').on('click.refresh', refresh_all); 
+    refresh_all();
 });
 

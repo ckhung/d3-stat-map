@@ -16,7 +16,6 @@ function divSwitcherHandler(d, i) {
     // using this almost like another argument passed
     // to the handler function."
     target = d3.select(this).attr('value');
-console.log(target);
     d3.select(this).classed('active', true);
     d3.select(target).
 	transition().style('display','block');
@@ -24,3 +23,11 @@ console.log(target);
 
 d3.selectAll('button.div-switch').on('click.div-switch', divSwitcherHandler);
 
+// https://stackoverflow.com/a/24259102
+// How to invoke "click" event programmatically in d3?
+// Andrew Plank's answer is best
+// https://stackoverflow.com/questions/17435838/how-to-use-d3-selectall-with-multiple-class-names
+d3.selectAll('button.div-switch').filter('.active').each(function(d, i) {
+    var onClickFunc = d3.select(this).on("click.div-switch");
+    onClickFunc.apply(this, [d, i]);
+});
