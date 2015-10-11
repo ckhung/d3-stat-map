@@ -8,14 +8,14 @@ function onAgeMinChange(evt, value) {
     d3.select('#text_age_min').text(value);
     n = Number(value) + Number(d3.select('#text_age_span').text()) - 1;
     d3.select('#text_age_max').text(n);
-    refresh_bar_chart();
+    refresh_all();
 }
 
 function onAgeSpanChange(evt, value) {
     d3.select('#text_age_span').text(value);
     n = Number(d3.select('#text_age_min').text()) + Number(value) - 1;
     d3.select('#text_age_max').text(n);
-    refresh_bar_chart();
+    refresh_all();
 }
 
 var census_data;
@@ -60,6 +60,23 @@ function refresh_bar_chart() {
 	.style('width', pop_ratio);
 }
 
+function refresh_gender_plot() {
+    width = parseInt(d3.select('#gender_plot_panel').style('width'));
+console.log('width' + width.toString());
+    svg = d3.select('#gender_plot_panel').select('svg');
+    svg.attr('width', width).attr('height', width);
+    svg.append('rect')
+	.attr('width', '100%')
+	.attr('height', '100%')
+	.attr('fill', '#eef');
+}
+
+function refresh_all(e) {
+    refresh_bar_chart();
+    refresh_gender_plot();
+console.log('refresh_all');
+}
+
 d3.json('census-taichung.json', function(error, data) {
     if (error) return console.warn(error);
     census_data = data;
@@ -67,6 +84,10 @@ d3.json('census-taichung.json', function(error, data) {
 	census_data[town]['男'].unshift(0);
 	census_data[town]['女'].unshift(0);
     }
-    refresh_bar_chart();
+
+    d3.select("#gender_plot_panel").append("svg")
+
+    d3.select(window).on('resize', refresh_all); 
+    d3.selectAll('button.div-switch').on('click.refresh', refresh_all); 
 });
 

@@ -11,17 +11,11 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   content="text/html; charset=utf-8" />
 
   <title>使用 D3 製作的統計地圖</title>
-  <!-- link type="text/css" rel="stylesheet" href="content-panel-div-switch.css" -->
-  <link type="text/css" rel=
-  "stylesheet" href="d3.slider.css" />
-  <link type="text/css" rel=
-  "stylesheet" href="main.css" />
-  <script type='text/javascript' src=
-  'jquery.js'>
-</script>
-  <script type='text/javascript' src=
-  'div-switcher.js'>
-</script>
+
+  <link type="text/css" rel= "stylesheet" href="d3.slider.css" />
+  <link type="text/css" rel= "stylesheet" href="main.css" />
+  <!-- script type='text/javascript' src= 'jquery.js'> </script>
+  <script type='text/javascript' src= 'div-switcher-jq.js'> </script -->
 </head>
 
 <body>
@@ -42,12 +36,11 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
       <div id="slider_age_span"></div>
     </div>
 
-    <p>注意： 若改變視窗大小， 就需要重新整理網頁才能操作。</p>
-
+x
     <p>
-    <a href="#bar_chart_panel" class= "div-switch">長條圖</a>
-    <a href="#gender_plot_panel" class="div-switch">男女人口</a>
-    <a href="#pop_map_panel" class= "div-switch">人口地圖</a>
+    <button class="div-switch" value="#bar_chart_panel">長條圖</button>
+    <button class="div-switch" value="#gender_plot_panel">男女人口</button>
+    <button class="div-switch" value="#pop_map_panel">人口地圖</button>
     </p>
 
     <div id="bar_chart_panel" class=
@@ -66,14 +59,9 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     </div>
 
     <div id="gender_plot_panel" class= "switchable-div">
-
-      <div id="gender_plot_proper">
-        hi
-      </div>
     </div>
 
-    <div id="pop_map_panel" class=
-    "switchable-div">
+    <div id="pop_map_panel" class= "switchable-div">
       <p>地圖哦</p>
     </div>
 
@@ -81,6 +69,7 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 <script type="text/javascript" src="d3.js"></script>
 <script type="text/javascript" src="d3.slider.js"></script>
+<script type="text/javascript" src="div-switcher-d3.js"></script>
 <script type="text/javascript" src="main.js"></script>
 </body>
 </html>
