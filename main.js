@@ -1,5 +1,6 @@
 var census_data = null;
 var town_boundary = null;
+var n2census = {};
 
 function onAgeMinChange(evt, value) {
     d3.select('#text_age_min').text(value);
@@ -41,24 +42,8 @@ function male_binomial_z(d) {
 function refresh_bar_chart() {
     var bar_chart = d3.select('#bar_chart_proper');
     var width = parseInt(bar_chart.style('width')) - 140;
-    var divs = bar_chart.selectAll('.entry').data(
-	census_data, function(d) { return d.name; }
-    );
-
-    divs.exit().remove();
-
-    // https://stackoverflow.com/questions/13203897/d3-nested-appends-and-data-flow
-    var new_entries = divs.enter()
-	.append('div')
-	.attr('class', 'entry');
-    new_entries.append('div')
-	.attr('class', 'entry_text')
-	.html(function(d) { return d.name; });
-    new_entries.append('div')
-	.attr('class', 'entry_bar')
-	.html('&nbsp;');
-
-    divs.select('.entry_bar').transition()
+    var bc_entries = bar_chart.selectAll('.bc_entry');
+    bc_entries.select('.entry_bar').transition()
 	.style('width', function (d) {
 	    return (pop_ratio(d)*width).toString() + 'px';
 	});
@@ -71,9 +56,6 @@ function refresh_gender_plot() {
 	attr('width', width).
 	attr('height', height);
     var canvas = d3.select('#gp_canvas');
-    canvas.select('#background')
-	.attr('width', '100%')
-	.attr('height', '100%');
     var data_values = census_data.map(pop_ratio);
     var sx = d3.scale.linear()
 	.range([0, width])
@@ -83,23 +65,7 @@ function refresh_gender_plot() {
 	.range([height*0.9, height*0.1])
 	.domain([d3.min(data_values), d3.max(data_values)]);
 
-    var towns = canvas.selectAll('.town').data(
-	census_data, function(d) { return d.name; }
-    );
-
-    towns.exit().remove();
-
-    var new_towns = towns.enter()
-	.append('text')
-	.attr('class', 'town')
-	.text(function (d) {
-	    match = /^.*?(縣|市)(.*)$/.exec(d.name);
-	    return match[2];
-	})
-	.attr('text-anchor', 'middle')
-	.attr('dominant-baseline', 'middle');
-// http://lea.verou.me/2013/03/easily-center-text-vertically-with-svg/
-
+    var towns = canvas.selectAll('.town');
     towns.transition()
 	.attr('x', function(d) { return sx(pop_ratio(d)); } )
 	.attr('y', function(d) { return sy(male_binomial_z(d)); } );
@@ -115,6 +81,11 @@ function refresh_gender_plot() {
 }
 
 function refresh_pop_map() {
+    var width = parseInt(d3.select('#pop_map_panel').style('width'));
+    var height = width;
+    d3.select('#pop_map_panel svg').
+	attr('width', width).
+	attr('height', height);
 }
 
 function refresh_all() {
@@ -134,37 +105,63 @@ function create_axes() {
     canvas.append('g').attr('id', 'y_axis');
 }
 
-function gpzh() {
-// gender plot zoom handler
-    d3.select('#gp_canvas').attr('transform', 'translate(' +
-	d3.event.translate + ')scale(' + d3.event.scale + ')');
-}
-
-function pmzh() {
-// population map zoom handler
-    d3.select('#pm_canvas').attr('transform', 'translate(' +
-	d3.event.translate + ')scale(' + d3.event.scale + ')');
-}
-
 function init() {
+    /******************* slider *******************/
     d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
 	step(1).on('slide', onAgeMinChange));
-
     d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
 	step(1).on('slide', onAgeSpanChange));
 
+    /******************* bar chart *******************/
+    var bc_entries = d3
+	.select('#bar_chart_proper')
+	.selectAll('.bc_entry')
+	.data(
+	    census_data, function(d) { return d.name; }
+	);
+    bc_entries.exit().remove();
+    // https://stackoverflow.com/questions/13203897/d3-nested-appends-and-data-flow
+    var new_entries = bc_entries.enter()
+	.append('div')
+	.attr('class', 'bc_entry');
+    new_entries.append('div')
+	.attr('class', 'entry_text')
+	.html(function(d) { return d.name; });
+    new_entries.append('div')
+	.attr('class', 'entry_bar')
+	.html('&nbsp;');
+
+    /******************* gender plot *******************/
     // gender plot zoom listener
     var gpzl = d3.behavior.zoom()
 	.scaleExtent([0.2, 8])
-	.on('zoom', gpzh);
+	.on('zoom', function gpzh() {
+	    d3.select('#gp_canvas').attr('transform', 'translate(' +
+	    d3.event.translate + ')scale(' + d3.event.scale + ')');
+	});
+
     // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
-    var canvas = d3.select('#gender_plot_panel').
-	append('svg').call(gpzl).append('g').attr('id', 'gp_canvas');
-    canvas.append('rect')
-	.attr('id', 'background')
-	.attr('fill', '#eef');
+    var canvas = d3.select('#gender_plot_panel')
+	.append('svg')
+	.call(gpzl)
+	.attr('style', 'outline: thin solid #088;')
+	.append('g')
+	.attr('id', 'gp_canvas');
     create_axes();
 
+    var towns = canvas.selectAll('.town').data(
+	census_data, function(d) { return d.name; }
+    );
+    towns.exit().remove();
+    var new_towns = towns.enter()
+	.append('text')
+	.attr('class', 'town')
+	.text(function (d) {
+	    match = /^.*?(縣|市)(.*)$/.exec(d.name);
+	    return match[2];
+	});
+
+    /******************* population map *******************/
 //    https://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
     var width = 600;
     var height = width*1.2;
@@ -179,20 +176,27 @@ function init() {
     // population map zoom listener
     var pmzl = d3.behavior.zoom()
 	.scaleExtent([0.2, 8])
-	.on('zoom', pmzh);
-    canvas = d3.select('#pop_map_panel').
-	append('svg').
-	attr('width', width).
-	attr('height', height).
-	call(pmzl).
-	append('g').
-	attr('id', 'pm_canvas');
+	.on('zoom', function () {
+	    d3.select('#pm_canvas').attr('transform', 'translate(' +
+	    d3.event.translate + ')scale(' + d3.event.scale + ')');
+	});
+
+    canvas = d3.select('#pop_map_panel')
+	.append('svg')
+	.call(pmzl)
+	.attr('style', 'outline: thin solid #088;')
+	.append('g')
+	.attr('id', 'pm_canvas');
     canvas.selectAll("path")
         .data(town_boundary.features)
     .enter()
-        .append("path")
-        .attr("d", path);
+        .append('path')
+        .attr('d', path)
+        .attr('class', 'town')
+	.append('svg:title')
+        .text(function(d) { return d.properties.name; });
 
+    /******************* overall setup *******************/
     d3.select(window).on('resize', refresh_all); 
     d3.selectAll('button.div-switch').on('click.refresh', refresh_all); 
     refresh_all();
@@ -207,6 +211,7 @@ d3.json('census-taichung.json', function(error, data) {
     data.forEach(function (d) {
 	d['男'].unshift(0);
 	d['女'].unshift(0);
+	n2census[d.name] = d;
     });
     census_data = data;
     if (is_ready()) init();

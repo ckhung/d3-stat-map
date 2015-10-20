@@ -37,7 +37,7 @@ button.div-switch.active {
 }
 
 /* https://stackoverflow.com/questions/2637696/how-to-place-div-side-by-side */
-.entry {
+.bc_entry {
   display: flex;
   margin-top: 2px;
   margin-bottom: 2px;
@@ -52,3 +52,16 @@ button.div-switch.active {
   background-color: #8c8;
 }
 
+svg path.town {
+  stroke-width: 0.5px;
+  fill: #aaa;
+  stroke: #000;
+}
+
+svg text.town {
+  stroke: #408;
+  stroke-width: 0.5px;
+  /* http://lea.verou.me/2013/03/easily-center-text-vertically-with-svg/ */
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
