@@ -55,7 +55,6 @@ function refresh_gender_plot() {
     d3.select('#gender_plot_panel svg').
 	attr('width', width).
 	attr('height', height);
-    var canvas = d3.select('#gp_canvas');
     var data_values = census_data.map(pop_ratio);
     var sx = d3.scale.linear()
 	.range([0, width])
@@ -65,6 +64,7 @@ function refresh_gender_plot() {
 	.range([height*0.9, height*0.1])
 	.domain([d3.min(data_values), d3.max(data_values)]);
 
+    var canvas = d3.select('#gp_canvas');
     var towns = canvas.selectAll('.town');
     towns.transition()
 	.attr('x', function(d) { return sx(pop_ratio(d)); } )
@@ -86,6 +86,14 @@ function refresh_pop_map() {
     d3.select('#pop_map_panel svg').
 	attr('width', width).
 	attr('height', height);
+    var canvas = d3.select('#pm_canvas');
+    var towns = canvas.selectAll("path.town");
+    towns.transition()
+	.attr('fill', function(d) {
+	    var c = n2census[d.properties.name];
+	    return typeof c === 'undefined' ?
+		'#aaa' : d3.hsl(180, pop_ratio(c) * 10, 0.5);
+	});
 }
 
 function refresh_all() {
@@ -193,11 +201,6 @@ function init() {
         .append('path')
         .attr('d', path)
         .attr('class', 'town')
-	.attr('fill', function(d) {
-	    var c = n2census[d.properties.name];
-	    return typeof c === 'undefined' ?
-		'#aaa' : d3.hsl(180, pop_ratio(c) * 10, 0.5);
-	})
 	.append('svg:title')
         .text(function(d) { return d.properties.name; });
 
@@ -224,6 +227,9 @@ d3.json('census-taichung.json', function(error, data) {
 
 d3.json('town-boundary.json', function(error, data) {
     if (error) return console.warn(error);
+    data.features = data.features.filter(function (d) {
+	return d.properties.name.indexOf('臺中市') >= 0;
+    });
     town_boundary = data;
     if (is_ready()) init();
 });
