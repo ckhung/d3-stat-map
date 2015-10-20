@@ -193,20 +193,13 @@ function init() {
         .append('path')
         .attr('d', path)
         .attr('class', 'town')
+	.attr('fill', function(d) {
+	    var c = n2census[d.properties.name];
+	    return typeof c === 'undefined' ?
+		'#aaa' : d3.hsl(180, pop_ratio(c) * 10, 0.5);
+	})
 	.append('svg:title')
         .text(function(d) { return d.properties.name; });
-
-    towns = canvas.selectAll('.town').data(
-	census_data, function(d) { return d.name; }
-    );
-    towns.exit().remove();
-    var new_towns = towns.enter()
-	.append('text')
-	.attr('class', 'town')
-	.text(function (d) {
-	    match = /^.*?(縣|市)(.*)$/.exec(d.name);
-	    return match[2];
-	});
 
     /******************* overall setup *******************/
     d3.select(window).on('resize', refresh_all); 

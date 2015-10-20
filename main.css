@@ -54,7 +54,7 @@ button.div-switch.active {
 
 svg path.town {
   stroke-width: 0.5px;
-  fill: #aaa;
+/*  fill: #aaa; */
   stroke: #000;
 }
 
