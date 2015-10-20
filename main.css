@@ -59,7 +59,7 @@ svg path.town {
 }
 
 svg text.town {
-  stroke: #408;
+  stroke: #204;
   stroke-width: 0.5px;
   /* http://lea.verou.me/2013/03/easily-center-text-vertically-with-svg/ */
   text-anchor: middle;

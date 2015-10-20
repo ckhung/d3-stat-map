@@ -196,6 +196,18 @@ function init() {
 	.append('svg:title')
         .text(function(d) { return d.properties.name; });
 
+    towns = canvas.selectAll('.town').data(
+	census_data, function(d) { return d.name; }
+    );
+    towns.exit().remove();
+    var new_towns = towns.enter()
+	.append('text')
+	.attr('class', 'town')
+	.text(function (d) {
+	    match = /^.*?(縣|市)(.*)$/.exec(d.name);
+	    return match[2];
+	});
+
     /******************* overall setup *******************/
     d3.select(window).on('resize', refresh_all); 
     d3.selectAll('button.div-switch').on('click.refresh', refresh_all); 
