@@ -2,6 +2,7 @@ var census_data = null;
 var town_boundary = null;
 var n2census = {};
 
+// https://github.com/MasterMaps/d3-slider
 function onAgeMinChange(evt, value) {
     d3.select('#text_age_min').text(value);
     var n = Number(value) + Number(d3.select('#text_age_span').text()) - 1;
@@ -124,7 +125,25 @@ function create_axes() {
     canvas.append('g').attr('id', 'y_axis');
 }
 
-function init() {
+function init(error, data) {
+    /******************* received input data files *******************/
+    var target_city = '新北市';
+    if (error) return console.warn(error);
+    census_data = data[0];
+    census_data = census_data.filter(function (d) {
+	return d.name.indexOf(target_city) >= 0;
+    });
+    census_data.forEach(function (d) {
+	d['男'].unshift(0);
+	d['女'].unshift(0);
+	n2census[d.name] = d;
+    });
+
+    town_boundary = data[1];
+    town_boundary.features = town_boundary.features.filter(function (d) {
+	return d.properties.name.indexOf(target_city) >= 0;
+    });
+
     /******************* slider *******************/
     d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
 	step(1).on('slide', onAgeMinChange));
@@ -221,30 +240,12 @@ function init() {
     refresh_all();
 }
 
-function is_ready() {
-    return census_data!==null && town_boundary!==null;
-}
+// https://github.com/mbostock/queue
+queue()
+    .defer(d3.json, 'census-town.json')
+    .defer(d3.json, 'town-boundary.json')
+    .awaitAll(init);
     
-d3.json('census-taichung.json', function(error, data) {
-    if (error) return console.warn(error);
-    data.forEach(function (d) {
-	d['男'].unshift(0);
-	d['女'].unshift(0);
-	n2census[d.name] = d;
-    });
-    census_data = data;
-    if (is_ready()) init();
-});
-
-d3.json('town-boundary.json', function(error, data) {
-    if (error) return console.warn(error);
-    data.features = data.features.filter(function (d) {
-	return d.properties.name.indexOf('臺中市') >= 0;
-    });
-    town_boundary = data;
-    if (is_ready()) init();
-});
-
     // https://stackoverflow.com/questions/13808741/bar-chart-with-d3-js-and-an-associative-array
     // Bar chart with d3.js and an associative array
 //    var divs = bar_chart.selectAll('.entry').data(
