@@ -1,3 +1,5 @@
+// obsolete. this file is not used
+
 // Adapted from http://wpaoli.building58.com/2009/10/super-simple-jquery-content-swapper/
 // Note: the jcps project does not work with d3.js: https://code.google.com/p/jquery-content-panel-switcher/
 

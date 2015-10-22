@@ -80,19 +80,30 @@ function refresh_gender_plot() {
 	.call(axisY);
 }
 
+// http://bl.ocks.org/mbostock/4060606 "choropleth"
 function refresh_pop_map() {
     var width = parseInt(d3.select('#pop_map_panel').style('width'));
     var height = width;
     d3.select('#pop_map_panel svg').
 	attr('width', width).
 	attr('height', height);
-    var canvas = d3.select('#pm_canvas');
-    var towns = canvas.selectAll("path.town");
+    var canvas = d3.select('#pm_canvas'),
+	towns = canvas.selectAll("path.town"),
+	prmin = d3.min(census_data, pop_ratio),
+	prmax = d3.max(census_data, pop_ratio);
+    // "d3.js piecewise scale" => https://github.com/mbostock/d3/wiki/Quantitative-Scales
+    // https://nelsonslog.wordpress.com/2011/04/11/d3-scales-and-interpolation/
+    // https://gist.github.com/mbostock/3014589
+    // http://bl.ocks.org/mbostock/3014589
+    var color = d3.scale.linear()
+	.range(['blue', 'white', 'red'])
+	.interpolate(d3.interpolateLab)
+	.domain([prmin, (prmin+prmax)/2, prmax]);
     towns.transition()
 	.attr('fill', function(d) {
 	    var c = n2census[d.properties.name];
-	    return typeof c === 'undefined' ?
-		'#aaa' : d3.hsl(180, pop_ratio(c) * 10, 0.5);
+	    // return typeof c === 'undefined' ? '#aaa' :
+	    return color(pop_ratio(c));
 	});
 }
 
