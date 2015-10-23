@@ -127,7 +127,7 @@ function create_axes() {
 
 function init(error, data) {
     /******************* received input data files *******************/
-    var target_city = '新北市';
+    var target_city = '高雄市';
     if (error) return console.warn(error);
     census_data = data[0];
     census_data = census_data.filter(function (d) {
@@ -141,7 +141,15 @@ function init(error, data) {
 
     town_boundary = data[1];
     town_boundary.features = town_boundary.features.filter(function (d) {
-	return d.properties.name.indexOf(target_city) >= 0;
+	if (d.properties.name.indexOf(target_city) < 0)
+	    return false;
+	if (! (d.properties.name in n2census)) {
+	    console.warn('在人口統計檔裡面找不到地圖邊界檔所提及的 「'
+		+ d.properties.name + '」');
+	    return false;
+	    // 人口統計檔裡， 鳳山、 三民各被切成兩區
+	}
+	return true;
     });
 
     /******************* slider *******************/
