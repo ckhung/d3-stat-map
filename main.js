@@ -1,4 +1,4 @@
-var target_census_data=[], full_census_data, town_boundary;
+var G = {};
 
 // https://github.com/MasterMaps/d3-slider
 function onAgeMinChange(evt, value) {
@@ -54,11 +54,11 @@ function refresh_gender_plot() {
     d3.select('#gender_plot_panel svg').
 	attr('width', width).
 	attr('height', height);
-    var data_values = target_census_data.map(pop_ratio);
+    var data_values = G.target_census_data.map(pop_ratio);
     var sx = d3.scale.linear()
 	.range([0, width])
 	.domain([d3.min(data_values), d3.max(data_values)]);
-    data_values = target_census_data.map(male_binomial_z);
+    data_values = G.target_census_data.map(male_binomial_z);
     var sy = d3.scale.linear()
 	.range([height*0.9, height*0.1])
 	.domain([d3.min(data_values), d3.max(data_values)]);
@@ -88,8 +88,8 @@ function refresh_pop_map() {
 	attr('height', height);
     var canvas = d3.select('#pm_canvas'),
 	towns = canvas.selectAll("path.town"),
-	prmin = d3.min(target_census_data, pop_ratio),
-	prmax = d3.max(target_census_data, pop_ratio);
+	prmin = d3.min(G.target_census_data, pop_ratio),
+	prmax = d3.max(G.target_census_data, pop_ratio);
     // "d3.js piecewise scale" => https://github.com/mbostock/d3/wiki/Quantitative-Scales
     // https://nelsonslog.wordpress.com/2011/04/11/d3-scales-and-interpolation/
     // https://gist.github.com/mbostock/3014589
@@ -121,14 +121,19 @@ function create_axes() {
     canvas.append('g').attr('id', 'y_axis');
 }
 
-function prepare_region() {
+function prepare_target_region(selected) {
+    G.target_city = selected;
+
+    G.target_census_data = G.full_census_data.filter(function (d) {
+	return d.name.indexOf(G.target_city) >= 0;
+    });
 
     /******************* bar chart *******************/
     var bc_entries = d3
 	.select('#bar_chart_proper')
 	.selectAll('.bc_entry')
 	.data(
-	    target_census_data, function(d) { return d.name; }
+	    G.target_census_data, function(d) { return d.name; }
 	);
     bc_entries.exit().remove();
     // https://stackoverflow.com/questions/13203897/d3-nested-appends-and-data-flow
@@ -143,28 +148,11 @@ function prepare_region() {
 	.html('&nbsp;');
 
     /******************* gender plot *******************/
-    // gender plot zoom listener
-    var gpzl = d3.behavior.zoom()
-	.scaleExtent([0.2, 8])
-	.on('zoom', function gpzh() {
-	    d3.select('#gp_canvas').attr('transform', 'translate(' +
-	    d3.event.translate + ')scale(' + d3.event.scale + ')');
-	});
-
-    // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
-    var canvas = d3.select('#gender_plot_panel')
-	.append('svg')
-	.call(gpzl)
-	.attr('style', 'outline: thin solid #088;')
-	.append('g')
-	.attr('id', 'gp_canvas');
-    create_axes();
-
-    var towns = canvas.selectAll('.town').data(
-	target_census_data, function(d) { return d.name; }
+    var towns = d3.select('#gp_canvas').selectAll('.town').data(
+	G.target_census_data, function(d) { return d.name; }
     );
     towns.exit().remove();
-    var new_towns = towns.enter()
+    towns.enter()
 	.append('text')
 	.attr('class', 'town')
 	.text(function (d) {
@@ -175,32 +163,43 @@ function prepare_region() {
     /******************* population map *******************/
 //    https://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
     var width = 600;
-    var height = width*1.2;
+    var height = width;
     var projection = d3.geo.mercator().scale(1).translate([0, 0]);
     var path = d3.geo.path().projection(projection);
-    var b = path.bounds(town_boundary),
+    var target_boundary = { 'type': 'FeatureCollection' };
+	target_boundary.features = G.town_boundary.features.filter(function (d) {
+	    return d.properties.name.indexOf(G.target_city) >= 0;
+	});
+    var b = path.bounds(target_boundary),
 	s = 0.95 / Math.max((b[1][0] - b[0][0]) / width,
 	    (b[1][1] - b[0][1]) / height),
 	t = [(width - s * (b[1][0] + b[0][0])) / 2,
 	    (height - s * (b[1][1] + b[0][1])) / 2];
     projection.scale(s).translate(t);
-    // population map zoom listener
-    var pmzl = d3.behavior.zoom()
-	.scaleExtent([0.2, 8])
-	.on('zoom', function () {
-	    d3.select('#pm_canvas').attr('transform', 'translate(' +
-	    d3.event.translate + ')scale(' + d3.event.scale + ')');
-	});
 
-    canvas = d3.select('#pop_map_panel')
-	.append('svg')
-	.call(pmzl)
-	.attr('style', 'outline: thin solid #088;')
-	.append('g')
-	.attr('id', 'pm_canvas');
-    canvas.selectAll("path")
-        .data(target_census_data, function(d) { return d.name; })
-    .enter()
+    // draw counties before towns of target county for
+    // correct z-order
+    // https://stackoverflow.com/questions/482115/with-javascript-can-i-change-the-z-index-layer-of-an-svg-g-element
+    var counties = d3.select('#pm_canvas').selectAll('path.county');
+    counties.remove();
+    counties = d3.select('#pm_canvas').selectAll('path.county')
+	.data(G.county_boundary.features, function(d) {
+	    return d.properties.C_Name;
+	});
+    counties.enter()
+        .append('path')
+        .attr('d', path)
+        .attr('class', 'county')
+	.attr('fill', '#ffe')
+	.attr('stroke', 'black')
+	.attr('stroke-width', 0.5)
+	.append('svg:title')
+        .text(function(d) { return d.properties.C_Name; });
+
+    towns = d3.select('#pm_canvas').selectAll("path.town")
+        .data(G.target_census_data, function(d) { return d.name; });
+    towns.exit().remove();
+    towns.enter()
         .append('path')
         .attr('d', function(d) { return path(d.boundary); })
         .attr('class', 'town')
@@ -215,36 +214,38 @@ function prepare_region() {
 
 function init(error, data) {
     /******************* received input data files *******************/
-    var target_city = '臺北市';
     if (error) return console.warn(error);
 
-    full_census_data = data[0];
-    town_boundary = data[1];
+    G.full_census_data = data[0];
+    G.town_boundary = data[1];
+    G.county_boundary = data[2];
 
     var n2map = {};
-    town_boundary.features.forEach(function (d) {
+    G.town_boundary.features.forEach(function (d) {
 	n2map[d.properties.name] = d;
     });
 
     var region_list = {};
-    full_census_data.forEach(function (d) {
+    G.full_census_data.forEach(function (d) {
 	region_list[/^(.{2,3}(縣|市))/.exec(d.name)[1]] = 0;
 	if (d.name in n2map)
 	    d.boundary = n2map[d.name];
 	else
 	    console.log(d.name + ' of census-town.json not found in town-boundary.json');
-	if (d.name.indexOf(target_city) >= 0)
-	    target_census_data.push(d);
     });
 
-    target_census_data = full_census_data.filter(function (d) {
-	return d.name.indexOf(target_city) >= 0;
-    });
-    target_census_data.forEach(function (d) {
+    G.full_census_data.forEach(function (d) {
 	d['男'].unshift(0);
 	d['女'].unshift(0);
     });
 
+    /******************* slider *******************/
+    d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
+	step(1).on('slide', onAgeMinChange));
+    d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
+	step(1).on('slide', onAgeSpanChange));
+
+    /******************* city/county selection *******************/
     var region_selection = d3
 	.select('#region_selection')
 	.selectAll('option')
@@ -253,25 +254,61 @@ function init(error, data) {
 	.append('option')
 	.attr('class', 'bc_entry')
 	.html(function(d) { return d; });
+    d3.select('#region_selection').on('change', function() {
+	// https://stackoverflow.com/questions/18883675/d3-js-get-value-of-selected-option
+	prepare_target_region(this.options[this.selectedIndex].value);
+    });
 
-    /******************* slider *******************/
-    d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
-	step(1).on('slide', onAgeMinChange));
-    d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
-	step(1).on('slide', onAgeSpanChange));
+    /******************* gender plot *******************/
+    // gender plot zoom listener
+    var gpzl = d3.behavior.zoom()
+	.scaleExtent([0.2, 8])
+	.on('zoom', function gpzh() {
+	    d3.select('#gp_canvas').attr('transform', 'translate(' +
+	    d3.event.translate + ')scale(' + d3.event.scale + ')');
+	});
 
-    prepare_region();
+    // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
+    d3.select('#gender_plot_panel')
+	.append('svg')
+	.call(gpzl)
+	.attr('style', 'outline: thin solid #088;')
+	.append('g')
+	.attr('id', 'gp_canvas');
+    create_axes();
+
+    /******************* population map *******************/
+    // population map zoom listener
+    var pmzl = d3.behavior.zoom()
+	.scaleExtent([0.1, 30])
+	.on('zoom', function () {
+	    d3.select('#pm_canvas').attr('transform', 'translate(' +
+	    d3.event.translate + ')scale(' + d3.event.scale + ')');
+	});
+
+    d3.select('#pop_map_panel')
+	.append('svg')
+	.call(pmzl)
+	.attr('style', 'outline: thin solid #088;')
+	.append('g')
+	.attr('id', 'pm_canvas');
+
+    /******************* start default target city/county *******************/
+    var default_target = '臺中市';
+    d3.select("#region_selection").property('value', default_target);
+    prepare_target_region(default_target);
 }
 
 // https://github.com/mbostock/queue
 queue()
     .defer(d3.json, 'census-town.json')
     .defer(d3.json, 'town-boundary.json')
+    .defer(d3.json, 'county-boundary.json')
     .awaitAll(init);
     
     // https://stackoverflow.com/questions/13808741/bar-chart-with-d3-js-and-an-associative-array
     // Bar chart with d3.js and an associative array
 //    var divs = bar_chart.selectAll('.entry').data(
-//        d3.entries(target_census_data), function(d) { return d.key; }
+//        d3.entries(G.target_census_data), function(d) { return d.key; }
 //    );
 //	    match = /^(.*?(縣|市))(.*)$/.exec(d.name);
