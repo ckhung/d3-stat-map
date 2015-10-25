@@ -39,8 +39,8 @@ function maleBinomialZ(d) {
   var m = d['男'][upper] - d['男'][minAge];
   var f = d['女'][upper] - d['女'][minAge];
   return (m === 0) ?
-    ((f === 0) ? 0 : -9) :
-    ((f === 0) ? 9 : (m - f) / 2 * Math.sqrt((m + f) / m / f));
+    ((f === 0) ? 0 : -12) :
+    ((f === 0) ? 12 : (m - f) / 2 * Math.sqrt((m + f) / m / f));
   // http://homepages.wmich.edu/~bwagner/StatReview/Binomial/Binomial%20Hyp.htm
 }
 
@@ -63,11 +63,11 @@ function refreshGenderPlot() {
   var dataValues = G.targetCensusData.map(popRatio);
   var sx = d3.scale.linear()
     .range([0, width])
-    .domain([d3.min(dataValues), d3.max(dataValues)]);
+    .domain([d3.min(dataValues)*0.8, d3.max(dataValues)*1.2]);
   dataValues = G.targetCensusData.map(maleBinomialZ);
   var sy = d3.scale.linear()
     .range([height * 0.9, height * 0.1])
-    .domain([d3.min(dataValues), d3.max(dataValues)]);
+    .domain([-12, 12]);
 
   var canvas = d3.select('#gp-canvas');
   var towns = canvas.selectAll('.town');
