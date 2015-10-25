@@ -1,1 +1,14 @@
-/home/ckhung/.jshintrc
+// https://seravo.fi/2013/javascript-the-winning-style
+{
+  "camelcase" : true,
+  "indent": 2,
+  "undef": true,
+  "quotmark": "single",
+  "trailing": true,
+  "curly": true,
+
+  // the following options are different from the winning style suggestions
+  "maxlen": 120,
+  // https://jslinterrors.com/a-is-better-written-in-dot-notation
+  "sub": true
+}
