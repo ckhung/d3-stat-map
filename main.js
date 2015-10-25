@@ -1,6 +1,4 @@
-var census_data = null;
-var town_boundary = null;
-var n2census = {};
+var target_census_data=[], full_census_data, town_boundary;
 
 // https://github.com/MasterMaps/d3-slider
 function onAgeMinChange(evt, value) {
@@ -56,11 +54,11 @@ function refresh_gender_plot() {
     d3.select('#gender_plot_panel svg').
 	attr('width', width).
 	attr('height', height);
-    var data_values = census_data.map(pop_ratio);
+    var data_values = target_census_data.map(pop_ratio);
     var sx = d3.scale.linear()
 	.range([0, width])
 	.domain([d3.min(data_values), d3.max(data_values)]);
-    data_values = census_data.map(male_binomial_z);
+    data_values = target_census_data.map(male_binomial_z);
     var sy = d3.scale.linear()
 	.range([height*0.9, height*0.1])
 	.domain([d3.min(data_values), d3.max(data_values)]);
@@ -90,8 +88,8 @@ function refresh_pop_map() {
 	attr('height', height);
     var canvas = d3.select('#pm_canvas'),
 	towns = canvas.selectAll("path.town"),
-	prmin = d3.min(census_data, pop_ratio),
-	prmax = d3.max(census_data, pop_ratio);
+	prmin = d3.min(target_census_data, pop_ratio),
+	prmax = d3.max(target_census_data, pop_ratio);
     // "d3.js piecewise scale" => https://github.com/mbostock/d3/wiki/Quantitative-Scales
     // https://nelsonslog.wordpress.com/2011/04/11/d3-scales-and-interpolation/
     // https://gist.github.com/mbostock/3014589
@@ -102,9 +100,7 @@ function refresh_pop_map() {
 	.domain([prmin, (prmin+prmax)/2, prmax]);
     towns.transition()
 	.attr('fill', function(d) {
-	    var c = n2census[d.properties.name];
-	    // return typeof c === 'undefined' ? '#aaa' :
-	    return color(pop_ratio(c));
+	    return color(pop_ratio(d));
 	});
 }
 
@@ -125,45 +121,14 @@ function create_axes() {
     canvas.append('g').attr('id', 'y_axis');
 }
 
-function init(error, data) {
-    /******************* received input data files *******************/
-    var target_city = '高雄市';
-    if (error) return console.warn(error);
-    census_data = data[0];
-    census_data = census_data.filter(function (d) {
-	return d.name.indexOf(target_city) >= 0;
-    });
-    census_data.forEach(function (d) {
-	d['男'].unshift(0);
-	d['女'].unshift(0);
-	n2census[d.name] = d;
-    });
-
-    town_boundary = data[1];
-    town_boundary.features = town_boundary.features.filter(function (d) {
-	if (d.properties.name.indexOf(target_city) < 0)
-	    return false;
-	if (! (d.properties.name in n2census)) {
-	    console.warn('在人口統計檔裡面找不到地圖邊界檔所提及的 「'
-		+ d.properties.name + '」');
-	    return false;
-	    // 人口統計檔裡， 鳳山、 三民各被切成兩區
-	}
-	return true;
-    });
-
-    /******************* slider *******************/
-    d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
-	step(1).on('slide', onAgeMinChange));
-    d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
-	step(1).on('slide', onAgeSpanChange));
+function prepare_region() {
 
     /******************* bar chart *******************/
     var bc_entries = d3
 	.select('#bar_chart_proper')
 	.selectAll('.bc_entry')
 	.data(
-	    census_data, function(d) { return d.name; }
+	    target_census_data, function(d) { return d.name; }
 	);
     bc_entries.exit().remove();
     // https://stackoverflow.com/questions/13203897/d3-nested-appends-and-data-flow
@@ -196,7 +161,7 @@ function init(error, data) {
     create_axes();
 
     var towns = canvas.selectAll('.town').data(
-	census_data, function(d) { return d.name; }
+	target_census_data, function(d) { return d.name; }
     );
     towns.exit().remove();
     var new_towns = towns.enter()
@@ -234,18 +199,68 @@ function init(error, data) {
 	.append('g')
 	.attr('id', 'pm_canvas');
     canvas.selectAll("path")
-        .data(town_boundary.features)
+        .data(target_census_data, function(d) { return d.name; })
     .enter()
         .append('path')
-        .attr('d', path)
+        .attr('d', function(d) { return path(d.boundary); })
         .attr('class', 'town')
 	.append('svg:title')
-        .text(function(d) { return d.properties.name; });
+        .text(function(d) { return d.name; });
 
     /******************* overall setup *******************/
     d3.select(window).on('resize', refresh_all); 
     d3.selectAll('button.div-switch').on('click.refresh', refresh_all); 
     refresh_all();
+}
+
+function init(error, data) {
+    /******************* received input data files *******************/
+    var target_city = '臺北市';
+    if (error) return console.warn(error);
+
+    full_census_data = data[0];
+    town_boundary = data[1];
+
+    var n2map = {};
+    town_boundary.features.forEach(function (d) {
+	n2map[d.properties.name] = d;
+    });
+
+    var region_list = {};
+    full_census_data.forEach(function (d) {
+	region_list[/^(.{2,3}(縣|市))/.exec(d.name)[1]] = 0;
+	if (d.name in n2map)
+	    d.boundary = n2map[d.name];
+	else
+	    console.log(d.name + ' of census-town.json not found in town-boundary.json');
+	if (d.name.indexOf(target_city) >= 0)
+	    target_census_data.push(d);
+    });
+
+    target_census_data = full_census_data.filter(function (d) {
+	return d.name.indexOf(target_city) >= 0;
+    });
+    target_census_data.forEach(function (d) {
+	d['男'].unshift(0);
+	d['女'].unshift(0);
+    });
+
+    var region_selection = d3
+	.select('#region_selection')
+	.selectAll('option')
+	.data(Object.keys(region_list))
+	.enter()
+	.append('option')
+	.attr('class', 'bc_entry')
+	.html(function(d) { return d; });
+
+    /******************* slider *******************/
+    d3.select('#slider_age_min').call(d3.slider().axis(true).min(0).max(100).
+	step(1).on('slide', onAgeMinChange));
+    d3.select('#slider_age_span').call(d3.slider().axis(true).min(1).max(101).
+	step(1).on('slide', onAgeSpanChange));
+
+    prepare_region();
 }
 
 // https://github.com/mbostock/queue
@@ -257,6 +272,6 @@ queue()
     // https://stackoverflow.com/questions/13808741/bar-chart-with-d3-js-and-an-associative-array
     // Bar chart with d3.js and an associative array
 //    var divs = bar_chart.selectAll('.entry').data(
-//        d3.entries(census_data), function(d) { return d.key; }
+//        d3.entries(target_census_data), function(d) { return d.key; }
 //    );
 //	    match = /^(.*?(縣|市))(.*)$/.exec(d.name);
