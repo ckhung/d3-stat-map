@@ -1,3 +1,5 @@
+/* global d3 */
+
 // Adapted from http://wpaoli.building58.com/2009/10/super-simple-jquery-content-swapper/
 // Note: the jcps project does not work with d3.js: https://code.google.com/p/jquery-content-panel-switcher/
 
@@ -15,7 +17,7 @@ function divSwitcherHandler(d, i) {
     // "d3 relies on the this keyword to point to the DOM element -
     // using this almost like another argument passed
     // to the handler function."
-    target = d3.select(this).attr('value');
+    var target = d3.select(this).attr('value');
     d3.select(this).classed('active', true);
     d3.select(target).
 	transition().style('display','block');
@@ -28,6 +30,6 @@ d3.selectAll('button.div-switch').on('click.div-switch', divSwitcherHandler);
 // Andrew Plank's answer is best
 // https://stackoverflow.com/questions/17435838/how-to-use-d3-selectall-with-multiple-class-names
 d3.selectAll('button.div-switch').filter('.active').each(function(d, i) {
-    var onClickFunc = d3.select(this).on("click.div-switch");
+    var onClickFunc = d3.select(this).on('click.div-switch');
     onClickFunc.apply(this, [d, i]);
 });

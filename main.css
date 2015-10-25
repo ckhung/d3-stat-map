@@ -3,7 +3,7 @@ h2 {
   margin: 60px 0 5px 0;
 }
 
-#gender_plot_panel {
+#gender-plot-panel {
   margin: auto;
   width: 96%;
   border: 1px solid #00c;
@@ -11,10 +11,6 @@ h2 {
 
 #content {
   margin: 10px;
-}
-
-#main_display {
-  background-color: #ffe;
 }
 
 .control {
@@ -44,11 +40,11 @@ button.div-switch.active {
   padding-right: 20px;
 }
 
-.entry_text {
+.entry-text {
   width: 120px;
 }
 
-.entry_bar {
+.entry-bar {
   background-color: #8c8;
 }
 
