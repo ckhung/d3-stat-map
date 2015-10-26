@@ -33,7 +33,7 @@ button.div-switch.active {
 }
 
 /* https://stackoverflow.com/questions/2637696/how-to-place-div-side-by-side */
-.bc_entry {
+.bc-entry {
   display: flex;
   margin-top: 2px;
   margin-bottom: 2px;
