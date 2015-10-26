@@ -19,6 +19,10 @@ h2 {
   margin-bottom: 30px;
 }
 
+div.div-switch-wrapper {
+  float: right;
+}
+
 button.div-switch {
 /*
   background-color: #eee;

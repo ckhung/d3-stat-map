@@ -36,20 +36,19 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
       <div id="slider-age-span"></div>
       <div id="slider-age-min"></div>
     </div>
-    <p>從 <span id=
-    "text-age-min">20</span> 歲到
-    <span id="text-age-max">24</span> 歲
-    (顯示範圍： <span id=
-    "text-age-span">5</span> 歲)</p>
 
-    <p>
+    <div>
     <select name="r" id="region-selection"></select>
-    <span style="background: #cfc; padding: 5px">
-    <button class="div-switch" value="#bar-chart-panel">長條圖</button>
-    <button class="div-switch" value="#gender-plot-panel">男女人口</button>
-    <button class="div-switch active" value="#pop-map-panel">人口地圖</button>
-    </span>
-    </p>
+    從 <span id="text-age-min">20</span> 歲到
+    <span id="text-age-max">24</span> 歲人口
+    (年齡層範圍： <span id="text-age-span">5</span> 歲)
+
+    <div class="div-switch-wrapper">
+      <button class="div-switch" value="#bar-chart-panel">長條圖</button>
+      <button class="div-switch" value="#gender-plot-panel">男女人口</button>
+      <button class="div-switch active" value="#pop-map-panel">人口地圖</button>
+    </div>
+    </div>
 
     <div id="bar-chart-panel" class="switchable-div">
 
