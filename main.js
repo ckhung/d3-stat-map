@@ -270,8 +270,10 @@ function init(error, data) {
   });
 
   /******************* slider *******************/
-  d3.select('#slider-age-min').call(d3.slider().axis(true).min(0).max(100).step(1).on('slide', onAgeMinChange));
-  d3.select('#slider-age-span').call(d3.slider().axis(true).min(1).max(101).step(1).on('slide', onAgeSpanChange));
+  var v = d3.select('#text-age-min').text();
+  d3.select('#slider-age-min').call(d3.slider().axis(true).min(0).max(100).step(1).value(v).on('slide', onAgeMinChange));
+  v = d3.select('#text-age-span').text();
+  d3.select('#slider-age-span').call(d3.slider().axis(true).min(1).max(101).step(1).value(v).on('slide', onAgeSpanChange));
 
   /******************* city/county selection *******************/
   var regionSelection = d3

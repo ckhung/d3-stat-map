@@ -1,5 +1,49 @@
 # d3-stat-map
-using d3 to create statistics graphs and statistics maps
+Interactive Taiwan census statistics graph and choropleth (statistics map) using D3.js
 
-詳見 [專案官網](http://ckhung.github.com/d3-stat-map/index.zh_TW.html)
-及 [統計圖頁面](http://ckhung.github.com/d3-stat-map/main.html)
+以 D3.js 製作的臺灣人口互動統計圖及統計地圖
+
+## 操作方式
+
+請在 [統計圖頁面](http://ckhung.github.com/d3-stat-map/main.html)
+先選取要觀察的縣市， 再用第一個滑動鈕選取要觀察的年齡範圍
+(例如 5 歲)。 然後移動第二個滑動鈕觀察不同起始年齡
+(例如 20 歲開始， 到 24 歲為止)
+人口佔各區或各鄉鎮的當地總人口多少百分比。
+
+共有三個分頁。
+- 最左邊長條圖程式作者的學步練習
+- 最右邊的人口地圖以紅色系顯示高百分比、 藍色系顯示低百分比。
+  可以用滑鼠滾輪放大縮小。
+- 對於人口分佈研究者而言， 視覺上最有幫助的其實是中間的男女人口圖。
+  橫軸是該年齡範圍佔各區域人口的百分比；
+  縱軸則是該年齡範圍男性人口佔各區域人口的百分比的 z 值。
+  也就是說， 從 -3 (個標準差) 到 +3 (個標準差) 之間是一般正常的狀況；
+  很大的值 (位於很上方) 表示該區男性偏多；
+  很負的值 (位於很下方) 表示該區女性偏多。
+  若女性人口為 0， 則以 12 表示； 男性人口為 0， 則以 -12 表示。
+
+一些有趣的觀察：
+- 臺中市中區在十幾歲的範圍人口比例特別高， 是因為家長選學區嗎?
+  可是中一中在北區； 中女中在西區啊?
+- 南屯區三四十歲的人口當中， 女性人口壓倒性超越男性啊!
+- 和平區五十多歲的人口比例特別高。
+
+## 資料來源及前置處理
+
+- 人口統計資料來自
+   [各村（里）戶籍人口統計月報表](http://data.gov.tw/node/8411)
+  2015 年 7 月份資料。 前置處理程式為 sum-census-village.js 。
+- 地圖資料來自 [直轄市、縣市界線](http://data.gov.tw/node/7442)
+  及 [鄉鎮市區界線](http://data.gov.tw/node/7441)； 前置處理請見
+  [這篇文章](http://newtoypia.blogspot.tw/2015/08/admin-boundary.html)。
+
+## 程式寫作簡要說明
+
+待補
+
+## 引用本程式
+
+若本程式對您的研究有幫助， 請這樣引用：
+> 洪朝貴 (2015)。 d3-stat-map 。 取自 https://github.com/ckhung/d3-stat-map 
+

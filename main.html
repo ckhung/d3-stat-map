@@ -10,7 +10,7 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   <meta http-equiv="Content-Type"
   content="text/html; charset=utf-8" />
 
-  <title>使用 D3 製作的統計地圖</title>
+  <title>以 D3.js 製作的臺灣人口互動統計圖及統計地圖</title>
 
   <link type="text/css" rel= "stylesheet" href="d3.slider.css" />
   <link type="text/css" rel= "stylesheet" href="main.css" />
@@ -20,17 +20,15 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 
 <body>
   <div id="content">
-    <h1>使用 D3 製作的統計地圖</h1>
+    <h1>以 D3.js 製作的臺灣人口互動統計圖及統計地圖</h1>
 
 <p>有 「長條圖」、 「男女人口」、 「人口地圖」
 三個分頁可以切換。 滑鼠滾輪可以縮放地圖。
-
-<p>未來會在 <a href="http://ckhung.github.com/d3-stat-map/index.zh_TW.html">
-計畫首頁</a> 及 <a href="https://github.com/ckhung/d3-stat-map">
-程式碼下載區</a> 補上更多文字說明。</p>
-
-<p><select name="r" id="region-selection">
-</select>
+主要顯示資訊為 「各階段年齡的人口佔該區總人口多少百分比」。
+更多說明請見 <a href="https://github.com/ckhung/d3-stat-map">
+程式碼下載區</a>。
+<!-- a href="http://ckhung.github.com/d3-stat-map/index.zh_TW.html">
+計畫首頁</a --> </p>
 
     <h2>[年齡範圍]</h2>
 
@@ -39,20 +37,23 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
       <div id="slider-age-min"></div>
     </div>
     <p>從 <span id=
-    "text-age-min">0</span> 歲到
-    <span id="text-age-max">1</span> 歲
+    "text-age-min">20</span> 歲到
+    <span id="text-age-max">24</span> 歲
     (顯示範圍： <span id=
-    "text-age-span">1</span> 歲)</p>
+    "text-age-span">5</span> 歲)</p>
 
     <p>
+    <select name="r" id="region-selection"></select>
+    <span style="background: #cfc; padding: 5px">
     <button class="div-switch" value="#bar-chart-panel">長條圖</button>
     <button class="div-switch" value="#gender-plot-panel">男女人口</button>
     <button class="div-switch active" value="#pop-map-panel">人口地圖</button>
+    </span>
     </p>
 
     <div id="bar-chart-panel" class="switchable-div">
 
-      <p>各階段年齡的人口佔該區總人口多少百分比：</p>
+    <h2>[長條圖]</h2>
 
       <div id="bar-chart-proper">
         <!--
@@ -65,9 +66,15 @@ html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     </div>
 
     <div id="gender-plot-panel" class= "switchable-div">
+
+    <h2>[男女人口對比]</h2>
+
     </div>
 
     <div id="pop-map-panel" class= "switchable-div">
+
+    <h2>[人口地圖]</h2>
+
     </div>
 
   </div>
