@@ -36,6 +36,11 @@ button.div-switch.active {
   background-color: #ccf;
 }
 
+.dummy-filler {
+  color: #fff;
+  font-size: 5%;
+}
+
 /* https://stackoverflow.com/questions/2637696/how-to-place-div-side-by-side */
 .bc-entry {
   display: flex;
