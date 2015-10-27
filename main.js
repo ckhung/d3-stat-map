@@ -7,14 +7,14 @@ function onAgeMinChange(evt, value) {
   d3.select('#text-age-min').text(value);
   var n = +value + Number(d3.select('#text-age-span').text()) - 1;
   d3.select('#text-age-max').text(n);
-  refreshAll();
+  refreshCurrent();
 }
 
 function onAgeSpanChange(evt, value) {
   d3.select('#text-age-span').text(value);
   var n = +d3.select('#text-age-min').text() + value - 1;
   d3.select('#text-age-max').text(n);
-  refreshAll();
+  refreshCurrent();
 }
 
 function popRatio(d) {
@@ -105,20 +105,41 @@ function refreshPopMap() {
   // https://nelsonslog.wordpress.com/2011/04/11/d3-scales-and-interpolation/
   // https://gist.github.com/mbostock/3014589
   // http://bl.ocks.org/mbostock/3014589
-  var color = d3.scale.linear()
+  var ratio2color = d3.scale.linear()
     .range(['blue', 'white', 'red'])
     .interpolate(d3.interpolateLab)
     .domain([prmin, (prmin + prmax) / 2, prmax]);
   towns.transition()
     .attr('fill', function(d) {
-      return color(popRatio(d));
+      return ratio2color(popRatio(d));
     });
+
+  // http://d3-legend.susielu.com/
+  d3.select('#color-legend').remove();
+  // note: we are dangerously recycling ratio2color
+  // in the belief that it won't be used any more
+  ratio2color.domain(ratio2color.domain().map(function(x) { return x * 100; }));
+  // take care to prevent the legend from being scaled
+  var legendBox = d3.select('#pm-wrapper')
+    .append('g')
+    .attr('id', 'color-legend')
+    .attr('transform', 'translate(20,20)');
+  var legend = d3.legend.color()
+    .scale(ratio2color)
+    .cells(7)
+    .title('圖例(%)')
+  legendBox.call(legend);
 }
 
-function refreshAll() {
-  refreshBarChart();
-  refreshGenderPlot();
-  refreshPopMap();
+function refreshCurrent() {
+  var active = d3.select('.div-switch.active').attr('value');
+  if (active == '#bar-chart-panel') {
+    refreshBarChart();
+  } else if (active == '#gender-plot-panel') {
+    refreshGenderPlot();
+  } else if (active == '#pop-map-panel') {
+    refreshPopMap();
+  }
 }
 
 function createAxes() {
@@ -234,9 +255,9 @@ function prepareTargetRegion(selected) {
     });
 
   /******************* overall setup *******************/
-  d3.select(window).on('resize', refreshAll);
-  d3.selectAll('button.div-switch').on('click.refresh', refreshAll);
-  refreshAll();
+  d3.select(window).on('resize', refreshCurrent);
+  d3.selectAll('button.div-switch').on('click.refresh', refreshCurrent);
+  refreshCurrent();
 }
 
 function init(error, data) {
@@ -322,6 +343,8 @@ function init(error, data) {
     .append('svg')
     .call(pmzl)
     .attr('style', 'outline: thin solid #088;')
+    .append('g')
+    .attr('id', 'pm-wrapper')	// see legend
     .append('g')
     .attr('id', 'pm-canvas');
 
