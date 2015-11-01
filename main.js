@@ -132,6 +132,8 @@ function refreshPopMap() {
     .cells(7)
     .title('圖例(%)')
   legendBox.call(legend);
+  // console.log(legendBox.selectAll('.label'));
+  // legendBox.selectAll('.label').transition().text('hello');
 }
 
 function refreshCurrent() {

@@ -1,1 +1,732 @@
-!function a(b,c,d){function e(g,h){if(!c[g]){if(!b[g]){var i="function"==typeof require&&require;if(!h&&i)return i(g,!0);if(f)return f(g,!0);var j=new Error("Cannot find module '"+g+"'");throw j.code="MODULE_NOT_FOUND",j}var k=c[g]={exports:{}};b[g][0].call(k.exports,function(a){var c=b[g][1][a];return e(c?c:a)},k,k.exports,a,b,c,d)}return c[g].exports}for(var f="function"==typeof require&&require,g=0;g<d.length;g++)e(d[g]);return e}({1:[function(a,b,c){var d=a("./legend");b.exports=function(){function a(a){var v=d.d3_calcType(c,t,j,k,o,r),w=a.append("g").attr("class",l+"legendCells"),x=w.selectAll("."+l+"cell").data(v.data),y=x.enter().append("g",".cell").attr("class",l+"cell").style("opacity",1e-6);shapeEnter=y.append(e).attr("class",l+"swatch"),shapes=x.select("g."+l+"cell "+e),d.d3_addEvents(y,u),x.exit().transition().style("opacity",0).remove(),d.d3_drawShapes(e,shapes,g,f,h,b),d.d3_addText(w,y,v.labels,l);var z=x.select("text"),A=shapes[0].map(function(a){return a.getBBox()});m?shapes.attr("class",function(a){return l+"swatch "+v.feature(a)}):"line"==e?shapes.style("stroke",v.feature):shapes.style("fill",v.feature);var B,C,D="start"==q?0:"middle"==q?.5:1;"vertical"===s?(B=function(a,b){return"translate(0, "+b*(A[b].height+i)+")"},C=function(a,b){return"translate("+(A[b].width+A[b].x+p)+","+(A[b].y+A[b].height/2+5)+")"}):"horizontal"===s&&(B=function(a,b){return"translate("+b*(A[b].width+i)+",0)"},C=function(a,b){return"translate("+(A[b].width*D+A[b].x)+","+(A[b].height+A[b].y+p+8)+")"}),d.d3_placement(s,x,B,z,C,q),d.d3_title(a,w,n,l),x.transition().style("opacity",1)}var b,c=d3.scale.linear(),e="rect",f=15,g=15,h=10,i=2,j=[5],k=[],l="",m=!1,n="",o=d3.format(".01f"),p=10,q="middle",r="to",s="vertical",t=!1,u=d3.dispatch("cellover","cellout","cellclick");return a.scale=function(b){return arguments.length?(c=b,a):a},a.cells=function(b){return arguments.length?((b.length>1||b>=2)&&(j=b),a):a},a.shape=function(c,d){return arguments.length?(("rect"==c||"circle"==c||"line"==c||"path"==c&&"string"==typeof d)&&(e=c,b=d),a):a},a.shapeWidth=function(b){return arguments.length?(f=+b,a):a},a.shapeHeight=function(b){return arguments.length?(g=+b,a):a},a.shapeRadius=function(b){return arguments.length?(h=+b,a):a},a.shapePadding=function(b){return arguments.length?(i=+b,a):a},a.labels=function(b){return arguments.length?(k=b,a):a},a.labelAlign=function(b){return arguments.length?(("start"==b||"end"==b||"middle"==b)&&(q=b),a):a},a.labelFormat=function(b){return arguments.length?(o=b,a):a},a.labelOffset=function(b){return arguments.length?(p=+b,a):a},a.labelDelimiter=function(b){return arguments.length?(r=b,a):a},a.useClass=function(b){return arguments.length?((b===!0||b===!1)&&(m=b),a):a},a.orient=function(b){return arguments.length?(b=b.toLowerCase(),("horizontal"==b||"vertical"==b)&&(s=b),a):a},a.ascending=function(b){return arguments.length?(t=!!b,a):a},a.classPrefix=function(b){return arguments.length?(l=b,a):a},a.title=function(b){return arguments.length?(n=b,a):a},d3.rebind(a,u,"on"),a}},{"./legend":2}],2:[function(a,b,c){b.exports={d3_identity:function(a){return a},d3_mergeLabels:function(a,b){if(0===b.length)return a;a=a?a:[];for(var c=b.length;c<a.length;c++)b.push(a[c]);return b},d3_linearLegend:function(a,b,c){var d=[];if(b.length>1)d=b;else for(var e=a.domain(),f=(e[e.length-1]-e[0])/(b-1),g=0;b>g;g++)d.push(e[0]+g*f);var h=d.map(c);return{data:d,labels:h,feature:function(b){return a(b)}}},d3_quantLegend:function(a,b,c){var d=a.range().map(function(d){var e=a.invertExtent(d);b(e[0]),b(e[1]);return b(e[0])+" "+c+" "+b(e[1])});return{data:a.range(),labels:d,feature:this.d3_identity}},d3_ordinalLegend:function(a){return{data:a.domain(),labels:a.domain(),feature:function(b){return a(b)}}},d3_drawShapes:function(a,b,c,d,e,f){"rect"===a?b.attr("height",c).attr("width",d):"circle"===a?b.attr("r",e):"line"===a?b.attr("x1",0).attr("x2",d).attr("y1",0).attr("y2",0):"path"===a&&b.attr("d",f)},d3_addText:function(a,b,c,d){b.append("text").attr("class",d+"label"),a.selectAll("g.cell text").data(c).text(this.d3_identity)},d3_calcType:function(a,b,c,d,e,f){var g=a.ticks?this.d3_linearLegend(a,c,e):a.invertExtent?this.d3_quantLegend(a,e,f):this.d3_ordinalLegend(a);return g.labels=this.d3_mergeLabels(g.labels,d),b&&(g.labels=this.d3_reverse(g.labels),g.data=this.d3_reverse(g.data)),g},d3_reverse:function(a){for(var b=[],c=0,d=a.length;d>c;c++)b[c]=a[d-c-1];return b},d3_placement:function(a,b,c,d,e,f){b.attr("transform",c),d.attr("transform",e),"horizontal"===a&&d.style("text-anchor",f)},d3_addEvents:function(a,b){var c=this;a.on("mouseover.legend",function(a){c.d3_cellOver(b,a,this)}).on("mouseout.legend",function(a){c.d3_cellOut(b,a,this)}).on("click.legend",function(a){c.d3_cellClick(b,a,this)})},d3_cellOver:function(a,b,c){a.cellover.call(c,b)},d3_cellOut:function(a,b,c){a.cellout.call(c,b)},d3_cellClick:function(a,b,c){a.cellclick.call(c,b)},d3_title:function(a,b,c,d){if(""!==c){a.append("text").attr("class",d+"legendTitle").text(c);var e=a.select("."+d+"legendTitle").map(function(a){return a[0].getBBox().height})[0],f=-b.map(function(a){return a[0].getBBox().x})[0];b.attr("transform","translate("+f+","+(e+10)+")")}}}},{}],3:[function(a,b,c){var d=a("./legend");b.exports=function(){function a(a){var s=d.d3_calcType(c,q,h,i,l,o),t=a.append("g").attr("class",j+"legendCells"),u=t.selectAll("."+j+"cell").data(s.data),v=u.enter().append("g",".cell").attr("class",j+"cell").style("opacity",1e-6);shapeEnter=v.append(e).attr("class",j+"swatch"),shapes=u.select("g."+j+"cell "+e),d.d3_addEvents(v,r),u.exit().transition().style("opacity",0).remove(),"line"===e?(d.d3_drawShapes(e,shapes,0,f),shapes.attr("stroke-width",s.feature)):d.d3_drawShapes(e,shapes,s.feature,s.feature,s.feature,b),d.d3_addText(t,v,s.labels,j);var w,x,y=u.select("text"),z=shapes[0].map(function(a,b){var d=a.getBBox(),f=c(s.data[b]);return"line"===e&&"horizontal"===p?d.height=d.height+f:"line"===e&&"vertical"===p&&(d.width=d.width),d}),A=d3.max(z,function(a){return a.height+a.y}),B=d3.max(z,function(a){return a.width+a.x}),C="start"==n?0:"middle"==n?.5:1;"vertical"===p?(w=function(a,b){var c=d3.sum(z.slice(0,b+1),function(a){return a.height});return"translate(0, "+(c+b*g)+")"},x=function(a,b){return"translate("+(B+m)+","+(z[b].y+z[b].height/2+5)+")"}):"horizontal"===p&&(w=function(a,b){var c=d3.sum(z.slice(0,b+1),function(a){return a.width});return"translate("+(c+b*g)+",0)"},x=function(a,b){return"translate("+(z[b].width*C+z[b].x)+","+(A+m)+")"}),d.d3_placement(p,u,w,y,x,n),d.d3_title(a,t,k,j),u.transition().style("opacity",1)}var b,c=d3.scale.linear(),e="rect",f=15,g=2,h=[5],i=[],j="",k="",l=d3.format(".01f"),m=10,n="middle",o="to",p="vertical",q=!1,r=d3.dispatch("cellover","cellout","cellclick");return a.scale=function(b){return arguments.length?(c=b,a):a},a.cells=function(b){return arguments.length?((b.length>1||b>=2)&&(h=b),a):a},a.shape=function(c,d){return arguments.length?(("rect"==c||"circle"==c||"line"==c)&&(e=c,b=d),a):a},a.shapeWidth=function(b){return arguments.length?(f=+b,a):a},a.shapePadding=function(b){return arguments.length?(g=+b,a):a},a.labels=function(b){return arguments.length?(i=b,a):a},a.labelAlign=function(b){return arguments.length?(("start"==b||"end"==b||"middle"==b)&&(n=b),a):a},a.labelFormat=function(b){return arguments.length?(l=b,a):a},a.labelOffset=function(b){return arguments.length?(m=+b,a):a},a.labelDelimiter=function(b){return arguments.length?(o=b,a):a},a.orient=function(b){return arguments.length?(b=b.toLowerCase(),("horizontal"==b||"vertical"==b)&&(p=b),a):a},a.ascending=function(b){return arguments.length?(q=!!b,a):a},a.classPrefix=function(b){return arguments.length?(j=b,a):a},a.title=function(b){return arguments.length?(k=b,a):a},d3.rebind(a,r,"on"),a}},{"./legend":2}],4:[function(a,b,c){var d=a("./legend");b.exports=function(){function a(a){var t=d.d3_calcType(b,r,i,j,m,p),u=a.append("g").attr("class",k+"legendCells"),v=u.selectAll("."+k+"cell").data(t.data),w=v.enter().append("g",".cell").attr("class",k+"cell").style("opacity",1e-6);shapeEnter=w.append(c).attr("class",k+"swatch"),shapes=v.select("g."+k+"cell "+c),d.d3_addEvents(w,s),v.exit().transition().style("opacity",0).remove(),d.d3_drawShapes(c,shapes,f,e,g,t.feature),d.d3_addText(u,w,t.labels,k);var x,y,z=v.select("text"),A=shapes[0].map(function(a){return a.getBBox()}),B=d3.max(A,function(a){return a.height}),C=d3.max(A,function(a){return a.width}),D="start"==n?0:"middle"==n?.5:1;"vertical"===q?(x=function(a,b){return"translate(0, "+b*(B+h)+")"},y=function(a,b){return"translate("+(C+o)+","+(A[b].y+A[b].height/2+5)+")"}):"horizontal"===q&&(x=function(a,b){return"translate("+b*(C+h)+",0)"},y=function(a,b){return"translate("+(A[b].width*D+A[b].x)+","+(B+o)+")"}),d.d3_placement(q,v,x,z,y,n),d.d3_title(a,u,l,k),v.transition().style("opacity",1)}var b=d3.scale.linear(),c="path",e=15,f=15,g=10,h=5,i=[5],j=[],k="",l="",m=d3.format(".01f"),n="middle",o=10,p="to",q="vertical",r=!1,s=d3.dispatch("cellover","cellout","cellclick");return a.scale=function(c){return arguments.length?(b=c,a):a},a.cells=function(b){return arguments.length?((b.length>1||b>=2)&&(i=b),a):a},a.shapePadding=function(b){return arguments.length?(h=+b,a):a},a.labels=function(b){return arguments.length?(j=b,a):a},a.labelAlign=function(b){return arguments.length?(("start"==b||"end"==b||"middle"==b)&&(n=b),a):a},a.labelFormat=function(b){return arguments.length?(m=b,a):a},a.labelOffset=function(b){return arguments.length?(o=+b,a):a},a.labelDelimiter=function(b){return arguments.length?(p=b,a):a},a.orient=function(b){return arguments.length?(b=b.toLowerCase(),("horizontal"==b||"vertical"==b)&&(q=b),a):a},a.ascending=function(b){return arguments.length?(r=!!b,a):a},a.classPrefix=function(b){return arguments.length?(k=b,a):a},a.title=function(b){return arguments.length?(l=b,a):a},d3.rebind(a,s,"on"),a}},{"./legend":2}],5:[function(a,b,c){d3.legend={color:a("./color"),size:a("./size"),symbol:a("./symbol")}},{"./color":1,"./size":3,"./symbol":4}]},{},[5]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var helper = require('./legend');
+
+module.exports = function(){
+
+  var scale = d3.scale.linear(),
+    shape = "rect",
+    shapeWidth = 15,
+    shapeHeight = 15,
+    shapeRadius = 10,
+    shapePadding = 2,
+    cells = [5],
+    labels = [],
+    classPrefix = "",
+    useClass = false,
+    title = "",
+    labelFormat = d3.format(".01f"),
+    labelOffset = 10,
+    labelAlign = "middle",
+    labelDelimiter = "to",
+    orient = "vertical",
+    ascending = false,
+    path,
+    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+    function legend(svg){
+
+      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+        legendG = svg.append('g').attr('class', classPrefix + 'legendCells');
+
+
+      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6);
+        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+      //add event handlers
+      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+      cell.exit().transition().style("opacity", 0).remove();
+
+      helper.d3_drawShapes(shape, shapes, shapeHeight, shapeWidth, shapeRadius, path);
+
+      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+      // sets placement
+      var text = cell.select("text"),
+        shapeSize = shapes[0].map( function(d){ return d.getBBox(); });
+
+      //sets scale
+      //everything is fill except for line which is stroke,
+      if (!useClass){
+        if (shape == "line"){
+          shapes.style("stroke", type.feature);
+        } else {
+          shapes.style("fill", type.feature);
+        }
+      } else {
+        shapes.attr("class", function(d){ return classPrefix + "swatch " + type.feature(d); });
+      }
+
+      var cellTrans,
+      textTrans,
+      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+      //positions cells and text
+      if (orient === "vertical"){
+        cellTrans = function(d,i) { return "translate(0, " + (i * (shapeSize[i].height + shapePadding)) + ")"; };
+        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width + shapeSize[i].x +
+          labelOffset) + "," + (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+      } else if (orient === "horizontal"){
+        cellTrans = function(d,i) { return "translate(" + (i * (shapeSize[i].width + shapePadding)) + ",0)"; }
+        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) +
+          "," + (shapeSize[i].height + shapeSize[i].y + labelOffset + 8) + ")"; };
+      }
+
+      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+      helper.d3_title(svg, legendG, title, classPrefix);
+
+      cell.transition().style("opacity", 1);
+
+    }
+
+
+
+  legend.scale = function(_) {
+    if (!arguments.length) return legend;
+    scale = _;
+    return legend;
+  };
+
+  legend.cells = function(_) {
+    if (!arguments.length) return legend;
+    if (_.length > 1 || _ >= 2 ){
+      cells = _;
+    }
+    return legend;
+  };
+
+  legend.shape = function(_, d) {
+    if (!arguments.length) return legend;
+    if (_ == "rect" || _ == "circle" || _ == "line" || (_ == "path" && (typeof d === 'string')) ){
+      shape = _;
+      path = d;
+    }
+    return legend;
+  };
+
+  legend.shapeWidth = function(_) {
+    if (!arguments.length) return legend;
+    shapeWidth = +_;
+    return legend;
+  };
+
+  legend.shapeHeight = function(_) {
+    if (!arguments.length) return legend;
+    shapeHeight = +_;
+    return legend;
+  };
+
+  legend.shapeRadius = function(_) {
+    if (!arguments.length) return legend;
+    shapeRadius = +_;
+    return legend;
+  };
+
+  legend.shapePadding = function(_) {
+    if (!arguments.length) return legend;
+    shapePadding = +_;
+    return legend;
+  };
+
+  legend.labels = function(_) {
+    if (!arguments.length) return legend;
+    labels = _;
+    return legend;
+  };
+
+  legend.labelAlign = function(_) {
+    if (!arguments.length) return legend;
+    if (_ == "start" || _ == "end" || _ == "middle") {
+      labelAlign = _;
+    }
+    return legend;
+  };
+
+  legend.labelFormat = function(_) {
+    if (!arguments.length) return legend;
+    labelFormat = _;
+    return legend;
+  };
+
+  legend.labelOffset = function(_) {
+    if (!arguments.length) return legend;
+    labelOffset = +_;
+    return legend;
+  };
+
+  legend.labelDelimiter = function(_) {
+    if (!arguments.length) return legend;
+    labelDelimiter = _;
+    return legend;
+  };
+
+  legend.useClass = function(_) {
+    if (!arguments.length) return legend;
+    if (_ === true || _ === false){
+      useClass = _;
+    }
+    return legend;
+  };
+
+  legend.orient = function(_){
+    if (!arguments.length) return legend;
+    _ = _.toLowerCase();
+    if (_ == "horizontal" || _ == "vertical") {
+      orient = _;
+    }
+    return legend;
+  };
+
+  legend.ascending = function(_) {
+    if (!arguments.length) return legend;
+    ascending = !!_;
+    return legend;
+  };
+
+  legend.classPrefix = function(_) {
+    if (!arguments.length) return legend;
+    classPrefix = _;
+    return legend;
+  };
+
+  legend.title = function(_) {
+    if (!arguments.length) return legend;
+    title = _;
+    return legend;
+  };
+
+  d3.rebind(legend, legendDispatcher, "on");
+
+  return legend;
+
+};
+
+
+},{"./legend":2}],2:[function(require,module,exports){
+module.exports = {
+
+  d3_identity: function (d) {
+    return d;
+  },
+
+  d3_mergeLabels: function (gen, labels) {
+
+      if(labels.length === 0) return gen;
+
+      gen = (gen) ? gen : [];
+
+      var i = labels.length;
+      for (; i < gen.length; i++) {
+        labels.push(gen[i]);
+      }
+      return labels;
+    },
+
+  d3_linearLegend: function (scale, cells, labelFormat) {
+    var data = [];
+
+    if (cells.length > 1){
+      data = cells;
+
+    } else {
+      var domain = scale.domain(),
+      increment = (domain[domain.length - 1] - domain[0])/(cells - 1),
+      i = 0;
+
+      for (; i < cells; i++){
+        data.push(domain[0] + i*increment);
+      }
+    }
+
+    var labels = data.map(labelFormat);
+
+    return {data: data,
+            labels: labels,
+            feature: function(d){ return scale(d); }};
+  },
+
+  d3_quantLegend: function (scale, labelFormat, labelDelimiter) {
+    var labels = scale.range().map(function(d){
+      var invert = scale.invertExtent(d),
+      a = labelFormat(invert[0]),
+      b = labelFormat(invert[1]);
+
+      // if (( (a) && (a.isNan()) && b){
+      //   console.log("in initial statement")
+        return labelFormat(invert[0]) + " " + labelDelimiter + " " + labelFormat(invert[1]);
+      // } else if (a || b) {
+      //   console.log('in else statement')
+      //   return (a) ? a : b;
+      // }
+
+    });
+
+    return {data: scale.range(),
+            labels: labels,
+            feature: this.d3_identity
+          };
+  },
+
+  d3_ordinalLegend: function (scale) {
+    return {data: scale.domain(),
+            labels: scale.domain(),
+            feature: function(d){ return scale(d); }};
+  },
+
+  d3_drawShapes: function (shape, shapes, shapeHeight, shapeWidth, shapeRadius, path) {
+    if (shape === "rect"){
+        shapes.attr("height", shapeHeight).attr("width", shapeWidth);
+
+    } else if (shape === "circle") {
+        shapes.attr("r", shapeRadius)//.attr("cx", shapeRadius).attr("cy", shapeRadius);
+
+    } else if (shape === "line") {
+        shapes.attr("x1", 0).attr("x2", shapeWidth).attr("y1", 0).attr("y2", 0);
+
+    } else if (shape === "path") {
+      shapes.attr("d", path);
+    }
+  },
+
+  d3_addText: function (svg, enter, labels, classPrefix){
+    enter.append("text").attr("class", classPrefix + "label");
+    svg.selectAll("g.cell text").data(labels).text(this.d3_identity);
+  },
+
+  d3_calcType: function (scale, ascending, cells, labels, labelFormat, labelDelimiter){
+    var type = scale.ticks ?
+            this.d3_linearLegend(scale, cells, labelFormat) : scale.invertExtent ?
+            this.d3_quantLegend(scale, labelFormat, labelDelimiter) : this.d3_ordinalLegend(scale);
+
+    type.labels = this.d3_mergeLabels(type.labels, labels);
+
+    if (ascending) {
+      type.labels = this.d3_reverse(type.labels);
+      type.data = this.d3_reverse(type.data);
+    }
+
+    return type;
+  },
+
+  d3_reverse: function(arr) {
+    var mirror = [];
+    for (var i = 0, l = arr.length; i < l; i++) {
+      mirror[i] = arr[l-i-1];
+    }
+    return mirror;
+  },
+
+  d3_placement: function (orient, cell, cellTrans, text, textTrans, labelAlign) {
+    cell.attr("transform", cellTrans);
+    text.attr("transform", textTrans);
+    if (orient === "horizontal"){
+      text.style("text-anchor", labelAlign);
+    }
+  },
+
+  d3_addEvents: function(cells, dispatcher){
+    var _ = this;
+
+      cells.on("mouseover.legend", function (d) { _.d3_cellOver(dispatcher, d, this); })
+          .on("mouseout.legend", function (d) { _.d3_cellOut(dispatcher, d, this); })
+          .on("click.legend", function (d) { _.d3_cellClick(dispatcher, d, this); });
+  },
+
+  d3_cellOver: function(cellDispatcher, d, obj){
+    cellDispatcher.cellover.call(obj, d);
+  },
+
+  d3_cellOut: function(cellDispatcher, d, obj){
+    cellDispatcher.cellout.call(obj, d);
+  },
+
+  d3_cellClick: function(cellDispatcher, d, obj){
+    cellDispatcher.cellclick.call(obj, d);
+  },
+
+  d3_title: function(svg, cellsSvg, title, classPrefix){
+    if (title !== ""){
+
+      svg.append('text')
+        .attr('class', classPrefix + 'legendTitle')
+        .text(title)
+
+      var yOffset = svg.select('.' + classPrefix + 'legendTitle')
+          .map(function(d) { return d[0].getBBox().height})[0],
+      xOffset = -cellsSvg.map(function(d) { return d[0].getBBox().x})[0];
+
+      cellsSvg.attr('transform', 'translate(' + xOffset + ',' + (yOffset + 10) + ')');
+
+    }
+  }
+}
+
+},{}],3:[function(require,module,exports){
+var helper = require('./legend');
+
+module.exports =  function(){
+
+  var scale = d3.scale.linear(),
+    shape = "rect",
+    shapeWidth = 15,
+    shapePadding = 2,
+    cells = [5],
+    labels = [],
+    useStroke = false,
+    classPrefix = "",
+    title = "",
+    labelFormat = d3.format(".01f"),
+    labelOffset = 10,
+    labelAlign = "middle",
+    labelDelimiter = "to",
+    orient = "vertical",
+    ascending = false,
+    path,
+    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+    function legend(svg){
+
+      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+        legendG = svg.append('g').attr('class', classPrefix + 'legendCells');
+
+
+      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6);
+        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+      //add event handlers
+      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+      cell.exit().transition().style("opacity", 0).remove();
+
+      //creates shape
+      if (shape === "line"){
+        helper.d3_drawShapes(shape, shapes, 0, shapeWidth);
+        shapes.attr("stroke-width", type.feature);
+      } else {
+        helper.d3_drawShapes(shape, shapes, type.feature, type.feature, type.feature, path);
+      }
+
+      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+      //sets placement
+      var text = cell.select("text"),
+        shapeSize = shapes[0].map(
+          function(d, i){
+            var bbox = d.getBBox()
+            var stroke = scale(type.data[i]);
+
+            if (shape === "line" && orient === "horizontal") {
+              bbox.height = bbox.height + stroke;
+            } else if (shape === "line" && orient === "vertical"){
+              bbox.width = bbox.width;
+            }
+
+            return bbox;
+        });
+
+      var maxH = d3.max(shapeSize, function(d){ return d.height + d.y; }),
+      maxW = d3.max(shapeSize, function(d){ return d.width + d.x; });
+
+      var cellTrans,
+      textTrans,
+      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+      //positions cells and text
+      if (orient === "vertical"){
+
+        cellTrans = function(d,i) {
+            var height = d3.sum(shapeSize.slice(0, i + 1 ), function(d){ return d.height; });
+            return "translate(0, " + (height + i*shapePadding) + ")"; };
+
+        textTrans = function(d,i) { return "translate(" + (maxW + labelOffset) + "," +
+          (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+      } else if (orient === "horizontal"){
+        cellTrans = function(d,i) {
+            var width = d3.sum(shapeSize.slice(0, i + 1 ), function(d){ return d.width; });
+            return "translate(" + (width + i*shapePadding) + ",0)"; };
+
+        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) + "," +
+              (maxH + labelOffset ) + ")"; };
+      }
+
+      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+      helper.d3_title(svg, legendG, title, classPrefix);
+
+      cell.transition().style("opacity", 1);
+
+    }
+
+  legend.scale = function(_) {
+    if (!arguments.length) return legend;
+    scale = _;
+    return legend;
+  };
+
+  legend.cells = function(_) {
+    if (!arguments.length) return legend;
+    if (_.length > 1 || _ >= 2 ){
+      cells = _;
+    }
+    return legend;
+  };
+
+
+  legend.shape = function(_, d) {
+    if (!arguments.length) return legend;
+    if (_ == "rect" || _ == "circle" || _ == "line" ){
+      shape = _;
+      path = d;
+    }
+    return legend;
+  };
+
+  legend.shapeWidth = function(_) {
+    if (!arguments.length) return legend;
+    shapeWidth = +_;
+    return legend;
+  };
+
+  legend.shapePadding = function(_) {
+    if (!arguments.length) return legend;
+    shapePadding = +_;
+    return legend;
+  };
+
+  legend.labels = function(_) {
+    if (!arguments.length) return legend;
+    labels = _;
+    return legend;
+  };
+
+  legend.labelAlign = function(_) {
+    if (!arguments.length) return legend;
+    if (_ == "start" || _ == "end" || _ == "middle") {
+      labelAlign = _;
+    }
+    return legend;
+  };
+
+  legend.labelFormat = function(_) {
+    if (!arguments.length) return legend;
+    labelFormat = _;
+    return legend;
+  };
+
+  legend.labelOffset = function(_) {
+    if (!arguments.length) return legend;
+    labelOffset = +_;
+    return legend;
+  };
+
+  legend.labelDelimiter = function(_) {
+    if (!arguments.length) return legend;
+    labelDelimiter = _;
+    return legend;
+  };
+
+  legend.orient = function(_){
+    if (!arguments.length) return legend;
+    _ = _.toLowerCase();
+    if (_ == "horizontal" || _ == "vertical") {
+      orient = _;
+    }
+    return legend;
+  };
+
+  legend.ascending = function(_) {
+    if (!arguments.length) return legend;
+    ascending = !!_;
+    return legend;
+  };
+
+  legend.classPrefix = function(_) {
+    if (!arguments.length) return legend;
+    classPrefix = _;
+    return legend;
+  };
+
+  legend.title = function(_) {
+    if (!arguments.length) return legend;
+    title = _;
+    return legend;
+  };
+
+  d3.rebind(legend, legendDispatcher, "on");
+
+  return legend;
+
+};
+
+
+},{"./legend":2}],4:[function(require,module,exports){
+var helper = require('./legend');
+
+module.exports = function(){
+
+  var scale = d3.scale.linear(),
+    shape = "path",
+    shapeWidth = 15,
+    shapeHeight = 15,
+    shapeRadius = 10,
+    shapePadding = 5,
+    cells = [5],
+    labels = [],
+    classPrefix = "",
+    useClass = false,
+    title = "",
+    labelFormat = d3.format(".01f"),
+    labelAlign = "middle",
+    labelOffset = 10,
+    labelDelimiter = "to",
+    orient = "vertical",
+    ascending = false,
+    legendDispatcher = d3.dispatch("cellover", "cellout", "cellclick");
+
+    function legend(svg){
+
+      var type = helper.d3_calcType(scale, ascending, cells, labels, labelFormat, labelDelimiter),
+        legendG = svg.append('g').attr('class', classPrefix + 'legendCells');
+
+      var cell = legendG.selectAll("." + classPrefix + "cell").data(type.data),
+        cellEnter = cell.enter().append("g", ".cell").attr("class", classPrefix + "cell").style("opacity", 1e-6);
+        shapeEnter = cellEnter.append(shape).attr("class", classPrefix + "swatch"),
+        shapes = cell.select("g." + classPrefix + "cell " + shape);
+
+      //add event handlers
+      helper.d3_addEvents(cellEnter, legendDispatcher);
+
+      //remove old shapes
+      cell.exit().transition().style("opacity", 0).remove();
+
+      helper.d3_drawShapes(shape, shapes, shapeHeight, shapeWidth, shapeRadius, type.feature);
+      helper.d3_addText(legendG, cellEnter, type.labels, classPrefix)
+
+      // sets placement
+      var text = cell.select("text"),
+        shapeSize = shapes[0].map( function(d){ return d.getBBox(); });
+
+      var maxH = d3.max(shapeSize, function(d){ return d.height; }),
+      maxW = d3.max(shapeSize, function(d){ return d.width; });
+
+      var cellTrans,
+      textTrans,
+      textAlign = (labelAlign == "start") ? 0 : (labelAlign == "middle") ? 0.5 : 1;
+
+      //positions cells and text
+      if (orient === "vertical"){
+        cellTrans = function(d,i) { return "translate(0, " + (i * (maxH + shapePadding)) + ")"; };
+        textTrans = function(d,i) { return "translate(" + (maxW + labelOffset) + "," +
+              (shapeSize[i].y + shapeSize[i].height/2 + 5) + ")"; };
+
+      } else if (orient === "horizontal"){
+        cellTrans = function(d,i) { return "translate(" + (i * (maxW + shapePadding)) + ",0)"; };
+        textTrans = function(d,i) { return "translate(" + (shapeSize[i].width*textAlign  + shapeSize[i].x) + "," +
+              (maxH + labelOffset ) + ")"; };
+      }
+
+      helper.d3_placement(orient, cell, cellTrans, text, textTrans, labelAlign);
+      helper.d3_title(svg, legendG, title, classPrefix);
+      cell.transition().style("opacity", 1);
+
+    }
+
+
+  legend.scale = function(_) {
+    if (!arguments.length) return legend;
+    scale = _;
+    return legend;
+  };
+
+  legend.cells = function(_) {
+    if (!arguments.length) return legend;
+    if (_.length > 1 || _ >= 2 ){
+      cells = _;
+    }
+    return legend;
+  };
+
+  legend.shapePadding = function(_) {
+    if (!arguments.length) return legend;
+    shapePadding = +_;
+    return legend;
+  };
+
+  legend.labels = function(_) {
+    if (!arguments.length) return legend;
+    labels = _;
+    return legend;
+  };
+
+  legend.labelAlign = function(_) {
+    if (!arguments.length) return legend;
+    if (_ == "start" || _ == "end" || _ == "middle") {
+      labelAlign = _;
+    }
+    return legend;
+  };
+
+  legend.labelFormat = function(_) {
+    if (!arguments.length) return legend;
+    labelFormat = _;
+    return legend;
+  };
+
+  legend.labelOffset = function(_) {
+    if (!arguments.length) return legend;
+    labelOffset = +_;
+    return legend;
+  };
+
+  legend.labelDelimiter = function(_) {
+    if (!arguments.length) return legend;
+    labelDelimiter = _;
+    return legend;
+  };
+
+  legend.orient = function(_){
+    if (!arguments.length) return legend;
+    _ = _.toLowerCase();
+    if (_ == "horizontal" || _ == "vertical") {
+      orient = _;
+    }
+    return legend;
+  };
+
+  legend.ascending = function(_) {
+    if (!arguments.length) return legend;
+    ascending = !!_;
+    return legend;
+  };
+
+  legend.classPrefix = function(_) {
+    if (!arguments.length) return legend;
+    classPrefix = _;
+    return legend;
+  };
+
+  legend.title = function(_) {
+    if (!arguments.length) return legend;
+    title = _;
+    return legend;
+  };
+
+  d3.rebind(legend, legendDispatcher, "on");
+
+  return legend;
+
+};
+
+
+},{"./legend":2}],5:[function(require,module,exports){
+d3.legend = {
+  color: require('./color'),
+  size: require('./size'),
+  symbol: require('./symbol')
+};
+},{"./color":1,"./size":3,"./symbol":4}]},{},[5]);
