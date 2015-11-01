@@ -118,7 +118,9 @@ function refreshPopMap() {
   d3.select('#color-legend').remove();
   // note: we are dangerously recycling ratio2color
   // in the belief that it won't be used any more
-  ratio2color.domain(ratio2color.domain().map(function(x) { return x * 100; }));
+  ratio2color
+    .domain(ratio2color.domain().map(function(x) { return x * 100; }).reverse())
+    .range(ratio2color.range().reverse());
   // take care to prevent the legend from being scaled
   var legendBox = d3.select('#pm-wrapper')
     .append('g')
