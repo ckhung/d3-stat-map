@@ -261,7 +261,7 @@ function prepareTargetRegion(selected) {
 
   /******************* overall setup *******************/
   d3.select(window).on('resize', refreshCurrent);
-  d3.selectAll('button.div-switch').on('click.refresh', refreshCurrent);
+  d3.selectAll('button.div-switch').on('click', refreshCurrent);
   refreshCurrent();
 }
 
@@ -318,8 +318,8 @@ function init(error, data) {
   });
 
   /******************* gender plot *******************/
-  // gender plot zoom listener
-  var gpzl = d3.behavior.zoom()
+  // gender plot zoom
+  var gpzoom = d3.behavior.zoom()
     .scaleExtent([0.2, 8])
     .on('zoom', function gpzh() {
       d3.select('#gp-canvas').attr('transform', 'translate(' +
@@ -329,15 +329,15 @@ function init(error, data) {
   // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
   d3.select('#gender-plot-panel')
     .append('svg')
-    .call(gpzl)
+    .call(gpzoom)
     .attr('style', 'outline: thin solid #088;')
     .append('g')
     .attr('id', 'gp-canvas');
   createAxes();
 
   /******************* population map *******************/
-  // population map zoom listener
-  var pmzl = d3.behavior.zoom()
+  // population map zoom
+  var pmzoom = d3.behavior.zoom()
     .scaleExtent([0.1, 30])
     .on('zoom', function() {
       d3.select('#pm-canvas').attr('transform', 'translate(' +
@@ -346,7 +346,7 @@ function init(error, data) {
 
   d3.select('#pop-map-panel')
     .append('svg')
-    .call(pmzl)
+    .call(pmzoom)
     .attr('style', 'outline: thin solid #088;')
     .append('g')
     .attr('id', 'pm-wrapper')	// see legend
