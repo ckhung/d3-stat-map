@@ -151,8 +151,6 @@ function createAxes() {
   // https://stackoverflow.com/questions/16919280/how-to-update-axis-using-d3-js
   var sx = d3.scale.linear().domain([0, 1]).range([0, 800]),
     sy = d3.scale.linear().domain([-3, 3]).range([0, 600]),
-    axisX = d3.svg.axis().scale(sx).orient('bottom'),
-    axisY = d3.svg.axis().scale(sy).orient('left'),
     canvas = d3.select('#gp-canvas');
   canvas.append('g').attr('id', 'x_axis');
   canvas.append('g').attr('id', 'y_axis');
