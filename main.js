@@ -46,7 +46,11 @@ function maleBinomialZ(d) {
 
 function refreshBarChart() {
   var barChart = d3.select('#bar-chart-proper');
-  var width = parseInt(barChart.style('width')) - 140;
+  var width = + barChart.style('width') - 140;
+  // this does not work: width = barChart.node().style.width - 140;
+  // https://stackoverflow.com/questions/3778335/how-to-retrieve-the-display-property-of-a-dom-element
+  // var width = barChart.node().getBBox();
+  // console.log(width);
   var bcEntries = barChart.selectAll('.bc-entry');
   bcEntries.select('.entry-bar').transition()
     .style('width', function(d) {
@@ -55,15 +59,14 @@ function refreshBarChart() {
 }
 
 function refreshGenderPlot() {
-  var width = parseInt(d3.select('#gender-plot-panel').style('width'));
-  var height = width * 0.6;
-  d3.select('#gender-plot-panel svg').
-  attr('width', width).
-  attr('height', height);
+  // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
+  var viewBox = d3.select('#gender-plot-panel svg')
+    .attr('viewBox').split(' ').map(parseFloat);
+  var width = viewBox[2], height = viewBox[3];
   var dataValues = G.targetCensusData.map(popRatio);
   var sx = d3.scale.linear()
     .range([0, width])
-    .domain([d3.min(dataValues)*0.8, d3.max(dataValues)*1.2]);
+    .domain([d3.min(dataValues) * 0.8, d3.max(dataValues) * 1.2]);
   dataValues = G.targetCensusData.map(maleBinomialZ);
   var sy = d3.scale.linear()
     .range([height * 0.9, height * 0.1])
@@ -89,18 +92,13 @@ function refreshGenderPlot() {
     .call(axisY);
 }
 
-// http://bl.ocks.org/mbostock/4060606 "choropleth"
+// http://bl.ocks.org/mbostock/4060606 'choropleth'
 function refreshPopMap() {
-  var width = parseInt(d3.select('#pop-map-panel').style('width'));
-  var height = width;
-  d3.select('#pop-map-panel svg').
-  attr('width', width).
-  attr('height', height);
   var canvas = d3.select('#pm-canvas'),
     towns = canvas.selectAll('path.town'),
     prmin = d3.min(G.targetCensusData, popRatio),
     prmax = d3.max(G.targetCensusData, popRatio);
-  // "d3.js piecewise scale" =>
+  // 'd3.js piecewise scale' =>
   // https://github.com/mbostock/d3/wiki/Quantitative-Scales
   // https://nelsonslog.wordpress.com/2011/04/11/d3-scales-and-interpolation/
   // https://gist.github.com/mbostock/3014589
@@ -130,7 +128,7 @@ function refreshPopMap() {
   var legend = d3.legend.color()
     .scale(ratio2color)
     .cells(7)
-    .title('圖例(%)')
+    .title('圖例(%)');
   legendBox.call(legend);
   // console.log(legendBox.selectAll('.label'));
   // legendBox.selectAll('.label').transition().text('hello');
@@ -157,6 +155,10 @@ function createAxes() {
 }
 
 function prepareTargetRegion(selected) {
+  if (typeof selected == 'undefined') {
+    var rs = d3.select('#region-selection').node();
+    selected = rs.options[rs.selectedIndex].value;
+  }
   G.targetCity = selected;
 
   G.targetCensusData = G.fullCensusData.filter(function(d) {
@@ -205,8 +207,10 @@ function prepareTargetRegion(selected) {
 
   /******************* population map *******************/
   // https://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
-  var width = 600;
-  var height = width;
+  // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
+  var viewBox = d3.select('#pop-map-panel svg')
+    .attr('viewBox').split(' ').map(parseFloat);
+  var width = viewBox[2], height = viewBox[3];
   var projection = d3.geo.mercator().scale(1).translate([0, 0]);
   var path = d3.geo.path().projection(projection);
   var targetBoundary = {
@@ -258,16 +262,13 @@ function prepareTargetRegion(selected) {
     });
 
   /******************* overall setup *******************/
-  d3.select(window).on('resize', refreshCurrent);
   d3.selectAll('button.div-switch').on('click', refreshCurrent);
   refreshCurrent();
 }
 
 function init(error, data) {
   /******************* received input data files *******************/
-  if (error) {
-    return console.warn(error);
-  }
+  if (error) { return console.warn(error); }
 
   G.fullCensusData = data[0];
   G.townBoundary = data[1];
@@ -295,9 +296,15 @@ function init(error, data) {
 
   /******************* slider *******************/
   var v = d3.select('#text-age-min').text();
-  d3.select('#slider-age-min').call(d3.slider().axis(true).min(0).max(100).step(1).value(v).on('slide', onAgeMinChange));
+  d3.select('#slider-age-min').call(
+    d3.slider().axis(true).min(0).max(100)
+      .step(1).value(v).on('slide', onAgeMinChange)
+  );
   v = d3.select('#text-age-span').text();
-  d3.select('#slider-age-span').call(d3.slider().axis(true).min(1).max(101).step(1).value(v).on('slide', onAgeSpanChange));
+  d3.select('#slider-age-span').call(
+    d3.slider().axis(true).min(1).max(101)
+      .step(1).value(v).on('slide', onAgeSpanChange)
+  );
 
   /******************* city/county selection *******************/
   var regionSelection = d3
@@ -310,10 +317,8 @@ function init(error, data) {
     .html(function(d) {
       return d;
     });
-  d3.select('#region-selection').on('change', function() {
-    // https://stackoverflow.com/questions/18883675/d3-js-get-value-of-selected-option
-    prepareTargetRegion(this.options[this.selectedIndex].value);
-  });
+  d3.select('#region-selection').on('change', prepareTargetRegion);
+  // https://stackoverflow.com/questions/18883675/d3-js-get-value-of-selected-option
 
   /******************* gender plot *******************/
   // gender plot zoom
@@ -325,8 +330,13 @@ function init(error, data) {
     });
 
   // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
+  // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
   d3.select('#gender-plot-panel')
+    .attr('class', 'svg-container')
     .append('svg')
+    .attr('preserveAspectRatio', 'xMinYMin meet')
+    .attr('viewBox', '0 0 800 600')
+    .attr('class', 'svg-content-responsive')
     .call(gpzoom)
     .attr('style', 'outline: thin solid #088;')
     .append('g')
@@ -343,7 +353,10 @@ function init(error, data) {
     });
 
   d3.select('#pop-map-panel')
+    .attr('class', 'svg-container')
     .append('svg')
+    .attr('preserveAspectRatio', 'xMinYMin meet')
+    .attr('viewBox', '0 0 800 600')
     .call(pmzoom)
     .attr('style', 'outline: thin solid #088;')
     .append('g')

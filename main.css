@@ -57,6 +57,23 @@ button.div-switch.active {
   background-color: #8c8;
 }
 
+/* https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js */
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
+}
+
 svg path.town {
   stroke-width: 0.5px;
 /*  fill: #aaa; */
