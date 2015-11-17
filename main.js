@@ -47,8 +47,9 @@ function maleBinomialZ(d) {
 function refreshBarChart() {
   var barChart = d3.select('#bar-chart-proper');
   var width = + /\d+/.exec(barChart.style('width'))[0] - 140;
-  // note: this does not work: width = barChart.node().style.width - 140;
+  // this does not work: width = barChart.node().style.width - 140;
   // https://stackoverflow.com/questions/3778335/how-to-retrieve-the-display-property-of-a-dom-element
+  // https://groups.google.com/forum/#!topic/d3-js/k_yiGCIDe0Y
   var bcEntries = barChart.selectAll('.bc-entry');
   bcEntries.select('.entry-bar').transition()
     .style('width', function(d) {
@@ -209,8 +210,8 @@ function prepareTargetRegion(selected) {
   var viewBox = d3.select('#pop-map-panel svg')
     .attr('viewBox').split(' ').map(parseFloat);
   var width = viewBox[2], height = viewBox[3];
-  var projection = d3.geo.mercator().scale(1).translate([0, 0]);
-  var path = d3.geo.path().projection(projection);
+  var mproj = d3.geo.mercator().scale(1).translate([0, 0]);
+  var path = d3.geo.path().projection(mproj);
   var targetBoundary = {
     'type': 'FeatureCollection'
   };
@@ -220,7 +221,7 @@ function prepareTargetRegion(selected) {
   var b = path.bounds(targetBoundary),
     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-  projection.scale(s).translate(t);
+  mproj.scale(s).translate(t);
 
   // draw counties before towns of target county for
   // correct z-order
