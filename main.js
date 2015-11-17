@@ -211,14 +211,14 @@ function prepareTargetRegion(selected) {
     .attr('viewBox').split(' ').map(parseFloat);
   var width = viewBox[2], height = viewBox[3];
   var mproj = d3.geo.mercator().scale(1).translate([0, 0]);
-  var path = d3.geo.path().projection(mproj);
+  var mapObjs = d3.geo.path().projection(mproj);
   var targetBoundary = {
     'type': 'FeatureCollection'
   };
   targetBoundary.features = G.countyBoundary.features.filter(function(d) {
     return d.properties['C_Name'].indexOf(G.targetCity) >= 0;
   });
-  var b = path.bounds(targetBoundary),
+  var b = mapObjs.bounds(targetBoundary),
     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
   mproj.scale(s).translate(t);
@@ -234,7 +234,7 @@ function prepareTargetRegion(selected) {
     });
   counties.enter()
     .append('path')
-    .attr('d', path)
+    .attr('d', mapObjs)
     .attr('class', 'county')
     .attr('fill', '#ffe')
     .attr('stroke', 'black')
@@ -252,7 +252,7 @@ function prepareTargetRegion(selected) {
   towns.enter()
     .append('path')
     .attr('d', function(d) {
-      return path(d.boundary);
+      return mapObjs(d.boundary);
     })
     .attr('class', 'town')
     .append('svg:title')
