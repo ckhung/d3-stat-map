@@ -9,7 +9,11 @@ var settings = {
 function divSwitcherHandler(d, i) {
   d3.selectAll('button.div-switch').classed('active', false);
   d3.selectAll('.switchable-div').
-  transition().style('display', 'none');
+  transition().delay(function(d,i) {
+    console.log(i);
+    console.log(d);
+    return 3;
+  }).style('display', 'none');
   // https://stackoverflow.com/questions/12923942/d3-js-binding-an-object-to-data-and-appending-for-each-key
   // https://stackoverflow.com/a/30463508
   // "d3 relies on the this keyword to point to the DOM element -

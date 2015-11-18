@@ -323,7 +323,7 @@ function init(error, data) {
   // gender plot zoom
   var gpzoom = d3.behavior.zoom()
     .scaleExtent([0.2, 8])
-    .on('zoom', function gpzh() {
+    .on('zoom', function () {
       d3.select('#gp-canvas').attr('transform', 'translate(' +
         d3.event.translate + ')scale(' + d3.event.scale + ')');
     });
@@ -331,6 +331,7 @@ function init(error, data) {
   // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
   // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
   d3.select('#gender-plot-panel')
+    .append('div')
     .attr('class', 'svg-container')
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
@@ -352,6 +353,7 @@ function init(error, data) {
     });
 
   d3.select('#pop-map-panel')
+    .append('div')
     .attr('class', 'svg-container')
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
