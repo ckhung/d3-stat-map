@@ -59,7 +59,7 @@ function refreshBarChart() {
 
 function refreshGenderPlot() {
   // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
-  var viewBox = d3.select('#gender-plot-panel svg')
+  var viewBox = d3.select('#gp-rsvg-wrapper svg')
     .attr('viewBox').split(' ').map(parseFloat);
   var width = viewBox[2], height = viewBox[3];
   var dataValues = G.targetCensusData.map(popRatio);
@@ -103,34 +103,26 @@ function refreshPopMap() {
   // https://gist.github.com/mbostock/3014589
   // http://bl.ocks.org/mbostock/3014589
   var ratio2color = d3.scale.linear()
-    .range(['blue', 'white', 'red'])
+    .range(['white', 'red'])
     .interpolate(d3.interpolateLab)
-    .domain([prmin, (prmin + prmax) / 2, prmax]);
+    .domain([prmin, prmax]);
   towns.transition()
     .attr('fill', function(d) {
       return ratio2color(popRatio(d));
     });
 
-  // http://d3-legend.susielu.com/
-  d3.select('#color-legend').remove();
   // note: we are dangerously recycling ratio2color
   // in the belief that it won't be used any more
+/*
   ratio2color
     .domain(ratio2color.domain().map(function(x) { return x * 100; }).reverse())
     .range(ratio2color.range().reverse());
-  // https://github.com/susielu/d3-legend/issues/15
-  // take care to prevent the legend from being scaled
-  var legendBox = d3.select('#pm-wrapper')
-    .append('g')
-    .attr('id', 'color-legend')
-    .attr('transform', 'translate(20,20)');
-  var legend = d3.legend.color()
-    .scale(ratio2color)
-    .cells(7)
-    .title('圖例(%)');
-  legendBox.call(legend);
-  // console.log(legendBox.selectAll('.label'));
-  // legendBox.selectAll('.label').transition().text('hello');
+*/
+  var legendBox = d3.select('#color-legend');
+  legendBox.selectAll('.label').transition().text(function (d, i) {
+    var r = (i/6.0*(prmax-prmin)+prmin)*100;
+    return r.toString().replace(/(\.\d\d)\d*/, '$1');
+  });
 }
 
 function refreshCurrent() {
@@ -151,6 +143,29 @@ function createAxes() {
     canvas = d3.select('#gp-canvas');
   canvas.append('g').attr('id', 'x_axis');
   canvas.append('g').attr('id', 'y_axis');
+}
+
+function removeLegend() {
+  d3.select('#color-legend').remove();
+}
+
+function createLegend() {
+  // http://d3-legend.susielu.com/
+  // https://github.com/susielu/d3-legend/issues/15
+  // take care to prevent the legend from being scaled
+  var legendBox = d3.select('#pm-wrapper')
+    .append('g')
+    .attr('id', 'color-legend')
+    .attr('transform', 'translate(20,20)');
+  var ratio2color = d3.scale.linear()
+    .range(['white', 'red'])
+    .interpolate(d3.interpolateLab)
+    .domain([0, 1]);
+  var legend = d3.legend.color()
+    .scale(ratio2color)
+    .cells(7)
+    .title('圖例(%)');
+  legendBox.call(legend);
 }
 
 function prepareTargetRegion(selected) {
@@ -207,7 +222,7 @@ function prepareTargetRegion(selected) {
   /******************* population map *******************/
   // https://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
   // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
-  var viewBox = d3.select('#pop-map-panel svg')
+  var viewBox = d3.select('#pm-rsvg-wrapper svg')
     .attr('viewBox').split(' ').map(parseFloat);
   var width = viewBox[2], height = viewBox[3];
   var mproj = d3.geo.mercator().scale(1).translate([0, 0]);
@@ -259,6 +274,9 @@ function prepareTargetRegion(selected) {
     .text(function(d) {
       return d.name;
     });
+
+  removeLegend();
+  createLegend();
 
   /******************* overall setup *******************/
   d3.selectAll('button.div-switch').on('click', refreshCurrent);
@@ -330,9 +348,7 @@ function init(error, data) {
 
   // http://bl.ocks.org/cpdean/7a71e687dd5a80f6fd57
   // https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
-  d3.select('#gender-plot-panel')
-    .append('div')
-    .attr('class', 'svg-container')
+  d3.select('#gp-rsvg-wrapper')
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 800 600')
@@ -352,9 +368,7 @@ function init(error, data) {
         d3.event.translate + ')scale(' + d3.event.scale + ')');
     });
 
-  d3.select('#pop-map-panel')
-    .append('div')
-    .attr('class', 'svg-container')
+  d3.select('#pm-rsvg-wrapper')
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 800 600')

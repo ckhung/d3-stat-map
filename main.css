@@ -65,13 +65,15 @@ button.div-switch.active {
 }
 
 /* https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js */
-.svg-container {
+.rsvg-container {
     display: inline-block;
     position: relative;
-    width: 96%;
-    padding-bottom: 72%; /* aspect ratio */
+    width: 99.2%;
+    padding-bottom: 74.4%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
+    margin-top: 0.4%;
+    margin-left: 0.4%;
 }
 
 .svg-content-responsive {
