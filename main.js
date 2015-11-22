@@ -38,9 +38,8 @@ function maleBinomialZ(d) {
   }
   var m = d['男'][upper] - d['男'][minAge];
   var f = d['女'][upper] - d['女'][minAge];
-  return (m === 0) ?
-    ((f === 0) ? 0 : -12) :
-    ((f === 0) ? 12 : (m - f) / 2 * Math.sqrt((m + f) / m / f));
+  var z = (m - f) / 2 * Math.sqrt((m + f + 0.02) / (m + 0.01) / (f + 0.01));
+  return (z>20) ? 20 : (z<-20) ? -20 : z;
   // http://homepages.wmich.edu/~bwagner/StatReview/Binomial/Binomial%20Hyp.htm
 }
 
@@ -69,7 +68,7 @@ function refreshGenderPlot() {
   dataValues = G.targetCensusData.map(maleBinomialZ);
   var sy = d3.scale.linear()
     .range([height * 0.9, height * 0.1])
-    .domain([-12, 12]);
+    .domain([-20, 20]);
 
   var canvas = d3.select('#gp-canvas');
   var towns = canvas.selectAll('.town');
@@ -345,9 +344,8 @@ function init(error, data) {
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 800 600')
-    .attr('class', 'svg-content-responsive')
+    .attr('class', 'rsvg-content')
     .call(gpzoom)
-    .attr('style', 'outline: thin solid #088;')
     .append('g')
     .attr('id', 'gp-canvas');
   createAxes();
@@ -365,8 +363,8 @@ function init(error, data) {
     .append('svg')
     .attr('preserveAspectRatio', 'xMinYMin meet')
     .attr('viewBox', '0 0 800 600')
+    .attr('class', 'rsvg-content')
     .call(pmzoom)
-    .attr('style', 'outline: thin solid #088;')
     .append('g')
     .attr('id', 'pm-zoom-or-zoomless')	// see legend
     .append('g')

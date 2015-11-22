@@ -75,11 +75,7 @@ button.div-switch.active {
     margin: 0.4%;
 }
 
-.rsvg-container.map {
-    padding-bottom: 0%;
-}
-
-.svg-content-responsive {
+.rsvg-content {
     display: inline-block;
     position: absolute;
     top: 10px;
