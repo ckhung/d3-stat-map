@@ -111,6 +111,15 @@ function refreshPopMap() {
     });
 
   var legendBox = d3.select('#color-legend');
+
+// this won't work:
+//  var legendScale = d3.scale.linear()
+//    .range(['red', 'white', 'blue'])
+//    .interpolate(d3.interpolateLab)
+//    .domain([1, 0.5, 0]);
+//  legendBox.scale(legendScale);
+
+// this works:
   legendBox.selectAll('.label').transition().text(function (d, i) {
     var r = (i/6.0*(prmin-prmax)+prmax)*100;
     return r.toString().replace(/(\.\d\d)\d*/, '$1');
@@ -148,12 +157,12 @@ function rebuildLegend() {
     .append('g')
     .attr('id', 'color-legend')
     .attr('transform', 'translate(20,20)');
-  var ratio2color = d3.scale.linear()
+  var legendScale = d3.scale.linear()
     .range(['red', 'white', 'blue'])
     .interpolate(d3.interpolateLab)
     .domain([1, 0.5, 0]);
   var legend = d3.legend.color()
-    .scale(ratio2color)
+    .scale(legendScale)
     .cells(7)
     .title('圖例(%)');
   legend(legendBox);
