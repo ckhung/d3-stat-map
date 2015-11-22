@@ -72,8 +72,11 @@ button.div-switch.active {
     padding-bottom: 74.4%; /* aspect ratio */
     vertical-align: top;
     overflow: hidden;
-    margin-top: 0.4%;
-    margin-left: 0.4%;
+    margin: 0.4%;
+}
+
+.rsvg-container.map {
+    padding-bottom: 0%;
 }
 
 .svg-content-responsive {

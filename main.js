@@ -103,26 +103,21 @@ function refreshPopMap() {
   // https://gist.github.com/mbostock/3014589
   // http://bl.ocks.org/mbostock/3014589
   var ratio2color = d3.scale.linear()
-    .range(['white', 'red'])
+    .range(['blue', 'white', 'red'])
     .interpolate(d3.interpolateLab)
-    .domain([prmin, prmax]);
+    .domain([prmin, (prmin+prmax)/2, prmax]);
   towns.transition()
     .attr('fill', function(d) {
       return ratio2color(popRatio(d));
     });
 
-  // note: we are dangerously recycling ratio2color
-  // in the belief that it won't be used any more
-/*
-  ratio2color
-    .domain(ratio2color.domain().map(function(x) { return x * 100; }).reverse())
-    .range(ratio2color.range().reverse());
-*/
   var legendBox = d3.select('#color-legend');
   legendBox.selectAll('.label').transition().text(function (d, i) {
-    var r = (i/6.0*(prmax-prmin)+prmin)*100;
+    var r = (i/6.0*(prmin-prmax)+prmax)*100;
     return r.toString().replace(/(\.\d\d)\d*/, '$1');
   });
+  // note: modifications to this function must be
+  // coordinated with modifications to rebuildLegend()
 }
 
 function refreshCurrent() {
@@ -145,27 +140,26 @@ function createAxes() {
   canvas.append('g').attr('id', 'y_axis');
 }
 
-function removeLegend() {
-  d3.select('#color-legend').remove();
-}
-
-function createLegend() {
+function rebuildLegend() {
   // http://d3-legend.susielu.com/
   // https://github.com/susielu/d3-legend/issues/15
   // take care to prevent the legend from being scaled
-  var legendBox = d3.select('#pm-wrapper')
+  d3.select('#color-legend').remove();
+  var legendBox = d3.select('#pm-zoom-or-zoomless')
     .append('g')
     .attr('id', 'color-legend')
     .attr('transform', 'translate(20,20)');
   var ratio2color = d3.scale.linear()
-    .range(['white', 'red'])
+    .range(['red', 'white', 'blue'])
     .interpolate(d3.interpolateLab)
-    .domain([0, 1]);
+    .domain([1, 0.5, 0]);
   var legend = d3.legend.color()
     .scale(ratio2color)
     .cells(7)
     .title('圖例(%)');
-  legendBox.call(legend);
+  legend(legendBox);
+  // note: modifications to this function must be
+  // coordinated with modifications to refreshPopMap()
 }
 
 function prepareTargetRegion(selected) {
@@ -275,8 +269,7 @@ function prepareTargetRegion(selected) {
       return d.name;
     });
 
-  removeLegend();
-  createLegend();
+  rebuildLegend();
 
   /******************* overall setup *******************/
   d3.selectAll('button.div-switch').on('click', refreshCurrent);
@@ -375,7 +368,7 @@ function init(error, data) {
     .call(pmzoom)
     .attr('style', 'outline: thin solid #088;')
     .append('g')
-    .attr('id', 'pm-wrapper')	// see legend
+    .attr('id', 'pm-zoom-or-zoomless')	// see legend
     .append('g')
     .attr('id', 'pm-canvas');
 

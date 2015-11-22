@@ -38,9 +38,9 @@ Interactive Taiwan census statistics graph and choropleth (statistics map) using
   及 [鄉鎮市區界線](http://data.gov.tw/node/7441)； 前置處理請見
   [這篇文章](http://newtoypia.blogspot.tw/2015/08/admin-boundary.html)。
 
-## 程式寫作簡要說明
+## (給開發者看的) 程式寫作說明
 
-待補
+[抄程式學 d3.js](http://newtoypia.blogspot.tw/2015/11/d3js.html)
 
 ## 引用本程式
 
