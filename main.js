@@ -122,7 +122,8 @@ function refreshPopMap() {
 // this works:
   legendBox.selectAll('.label').transition().text(function (d, i) {
     var r = (i/6.0*(prmin-prmax)+prmax)*100;
-    return r.toString().replace(/(\.\d\d)\d*/, '$1');
+//    return r.toString().replace(/(\.\d\d)\d*/, '$1');
+    return d3.format('.2f')(r);
   });
   // note: modifications to this function must be
   // coordinated with modifications to rebuildLegend()
