@@ -1,0 +1,48 @@
+digraph G {
+concentrate = true;
+			subgraph legend{
+			rank = min;
+			label = "legend";
+			Legend [shape=none, margin=0, label = <
+				<table cellspacing="0" cellpadding="0" border="1"><tr><td>Code2flow Legend</td></tr><tr><td>
+				<table cellspacing="0">
+				<tr><td>Regular function</td><td width="50px"></td></tr>
+				<tr><td>Trunk function (nothing calls this)</td><td bgcolor='coral'></td></tr>
+				<tr><td>Leaf function (this calls nothing else)</td><td bgcolor='green'></td></tr>
+				<tr><td>Function call which returns no value</td><td>&#8594;</td></tr>
+				<tr><td>Function call returns some value</td><td><font color='blue'>&#8594;</font></td></tr>
+				</table></td></tr></table>
+				>];}node51 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "coral" label = "0: (main window frame (runs on import))" ];
+node3 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "coral" label = "6: onAgeMinChange" ];
+node5 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "coral" label = "13: onAgeSpanChange" ];
+node7 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "green" label = "20: popRatio" ];
+node9 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "green" label = "32: maleBinomialZ" ];
+node11 [splines=ortho shape = "rect" style = "rounded" label = "46: refreshBarChart" ];
+node13 [splines=ortho shape = "rect" style = "rounded" label = "59: refreshGenderPlot" ];
+node17 [splines=ortho shape = "rect" style = "rounded" label = "95: refreshPopMap" ];
+node19 [splines=ortho shape = "rect" style = "rounded" label = "133: refreshCurrent" ];
+node21 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "green" label = "145: createAxes" ];
+node23 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "green" label = "157: rebuildLegend" ];
+node38 [splines=ortho shape = "rect" style = "rounded" label = "176: prepareTargetRegion" ];
+node50 [splines=ortho shape = "rect" style = "rounded,filled" fillcolor = "coral" label = "294: init" ];
+node3 -> node19;
+node5 -> node19;
+node11 -> node7 [color="blue" penwidth="2"];
+node13 -> node7 [color="blue" penwidth="2"];
+node13 -> node9 [color="blue" penwidth="2"];
+node17 -> node7 [color="blue" penwidth="2"];
+node19 -> node11 [color="blue" penwidth="2"];
+node19 -> node13 [color="blue" penwidth="2"];
+node19 -> node17 [color="blue" penwidth="2"];
+node38 -> node19;
+node38 -> node23;
+node50 -> node21;
+node50 -> node38 [color="blue" penwidth="2"];
+subgraph clustermain0{
+node51 node3 node5 node7 node9 node11 node13 node17 node19 node21 node23 node38 node50 node3 node5 node7 node9 node11 node13 node17 node19 node21 node23 node38 node50 ;
+label="main";
+style=filled;
+color=black;
+graph[style=dotted];
+};
+}
