@@ -1,6 +1,6 @@
 /* global window, console, d3, queue */
 // https://stackoverflow.com/questions/11957977/how-to-fix-foo-is-not-defined-error-reported-by-jslint
-var G = {}; // global variables
+var G = { }; // global variables
 
 // https://github.com/MasterMaps/d3-slider
 function onAgeMinChange(evt, value) {
@@ -110,23 +110,12 @@ function refreshPopMap() {
       return ratio2color(popRatio(d));
     });
 
-  var legendBox = d3.select('#color-legend');
-
-// this won't work:
-//  var legendScale = d3.scale.linear()
-//    .range(['red', 'white', 'blue'])
-//    .interpolate(d3.interpolateLab)
-//    .domain([1, 0.5, 0]);
-//  legendBox.scale(legendScale);
-
-// this works:
-  legendBox.selectAll('.label').transition().text(function (d, i) {
-    var r = (i/6.0*(prmin-prmax)+prmax)*100;
-//    return r.toString().replace(/(\.\d\d)\d*/, '$1');
-    return d3.format('.2f')(r);
-  });
-  // note: modifications to this function must be
-  // coordinated with modifications to rebuildLegend()
+  // note: ratio2color is being irresponsibly recycled
+  // in a different context...
+  ratio2color.domain(ratio2color.domain().map(function(r) { return r*100; }));
+  G.legendPainter.scale(ratio2color);
+  G.legendPainter(d3.select('#color-legend'));
+  // https://github.com/susielu/d3-legend/issues/18
 }
 
 function refreshCurrent() {
@@ -158,17 +147,12 @@ function rebuildLegend() {
     .append('g')
     .attr('id', 'color-legend')
     .attr('transform', 'translate(20,20)');
-  var legendScale = d3.scale.linear()
-    .range(['red', 'white', 'blue'])
-    .interpolate(d3.interpolateLab)
-    .domain([1, 0.5, 0]);
-  var legend = d3.legend.color()
-    .scale(legendScale)
+  G.legendPainter = d3.legend.color()
     .cells(7)
-    .title('圖例(%)');
-  legend(legendBox);
-  // note: modifications to this function must be
-  // coordinated with modifications to refreshPopMap()
+    .title('圖例(%)')
+    .ascending(true);
+  // https://github.com/susielu/d3-legend/issues/15
+  // https://github.com/susielu/d3-legend/issues/18
 }
 
 function prepareTargetRegion(selected) {
