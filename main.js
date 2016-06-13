@@ -45,7 +45,8 @@ function maleBinomialZ(d) {
 
 function refreshBarChart() {
   var barChart = d3.select('#bar-chart-proper');
-  var width = + /\d+/.exec(barChart.style('width'))[0] - 140;
+  var width = barChart.style('width').match(/(\d+)px/);
+  width = width && +width[1] > 140 ? + width[1] - 140 : 0;
   // this does not work: width = barChart.node().style.width - 140;
   // https://stackoverflow.com/questions/3778335/how-to-retrieve-the-display-property-of-a-dom-element
   // https://groups.google.com/forum/#!topic/d3-js/k_yiGCIDe0Y
