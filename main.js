@@ -38,8 +38,9 @@ function maleBinomialZ(d) {
   }
   var m = d['男'][upper] - d['男'][minAge];
   var f = d['女'][upper] - d['女'][minAge];
-  var z = (m - f) / 2 * Math.sqrt((m + f + 0.02) / (m + 0.01) / (f + 0.01));
-  return (z>20) ? 20 : (z<-20) ? -20 : z;
+  // assuming population mean of males is 0.5
+  return (m - f) / Math.sqrt(m + f + 0.01);
+  // https://onlinecourses.science.psu.edu/stat414/node/179
   // http://homepages.wmich.edu/~bwagner/StatReview/Binomial/Binomial%20Hyp.htm
 }
 
